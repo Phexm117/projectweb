@@ -98,70 +98,28 @@
 
       <!-- Pet Cards -->
       <div class="pet-cards-container">
-        <div class="pet-card" data-type="cats" data-gender="female" data-age="2-3">
-          <img src="https://images.unsplash.com/photo-1574158622682-e40c69881006?w=300&h=300&fit=crop" alt="Cat">
-          <h6>โจมิ</h6>
-          <p><span class="badge">แมว</span> <span class="badge">2 y</span></p>
-          <div class="pet-info">
-            <span>♀ เพศเมีย</span>
-            <span>💚</span>
+        <div class="pet-card" onclick="goToDetail('1')" data-petid="1" data-petname="โคนัน" data-petgender="♀" data-petage="2Y" data-type="cats" data-gender="female" data-age="2-3" style="background: linear-gradient(135deg, #ffc9e3 0%, #ffb3d9 100%); cursor: pointer; position: relative;">
+          <img src="/แมว.jpg" alt="Cat">
+          <span class="heart-icon" style="position: absolute; top: 10px; right: 10px; font-size: 24px; cursor: pointer;" onclick="event.stopPropagation(); toggleFavorite(this, '1', 'โคนัน', '♀', '2Y')">🤍</span>
+          <h6>โคนัน</h6>
+          <p>♀ เพศเมีย 2Y 💉</p>
+          <div class="pet-footer">
+            <span class="badge-small" onclick="event.stopPropagation(); goToDetail('1')">รายละเอียด</span>
           </div>
-          <button class="adopt-btn">รับเลี้ยง</button>
         </div>
 
-        <div class="pet-card" data-type="cats" data-gender="male" data-age="3-5">
-          <img src="https://images.unsplash.com/photo-1574144611937-0df059b5ef3e?w=300&h=300&fit=crop" alt="Cat">
+        <div class="pet-card" onclick="goToDetail('2')" data-petid="2" data-petname="ปลายเหว" data-petgender="♂" data-petage="5Y" data-type="cats" data-gender="male" data-age="3-5" style="background: linear-gradient(135deg, #d4dce8 0%, #c8d5e3 100%); cursor: pointer; position: relative;">
+          <img src="/แมว.jpg" alt="Cat">
+          <span class="heart-icon" style="position: absolute; top: 10px; right: 10px; font-size: 24px; cursor: pointer;" onclick="event.stopPropagation(); toggleFavorite(this, '2', 'ปลายเหว', '♂', '5Y')">🤍</span>
           <h6>ปลายเหว</h6>
-          <p><span class="badge">แมว</span> <span class="badge">5 y</span></p>
-          <div class="pet-info">
-            <span>♂ เพศผู้</span>
-            <span>💚</span>
+          <p>♂ เพศผู้ 5Y 💉</p>
+          <div class="pet-footer">
+            <span class="badge-small" onclick="event.stopPropagation(); goToDetail('2')">รายละเอียด</span>
           </div>
-          <button class="adopt-btn">รับเลี้ยง</button>
         </div>
 
-        <div class="pet-card" data-type="dogs" data-gender="male" data-age="1-3">
-          <img src="https://images.unsplash.com/photo-1633722715463-d30628519e4d?w=300&h=300&fit=crop" alt="Dog">
-          <h6>คุณระ</h6>
-          <p><span class="badge">สุนัข</span> <span class="badge">3 y</span></p>
-          <div class="pet-info">
-            <span>♂ เพศผู้</span>
-            <span>💚</span>
-          </div>
-          <button class="adopt-btn">รับเลี้ยง</button>
-        </div>
 
-        <div class="pet-card" data-type="dogs" data-gender="female" data-age="3-5">
-          <img src="https://images.unsplash.com/photo-1587300411107-ec96884aa519?w=300&h=300&fit=crop" alt="Dog">
-          <h6>โมเคีย</h6>
-          <p><span class="badge">สุนัข</span> <span class="badge">4 y</span></p>
-          <div class="pet-info">
-            <span>♀ เพศเมีย</span>
-            <span>💚</span>
-          </div>
-          <button class="adopt-btn">รับเลี้ยง</button>
-        </div>
-
-        <div class="pet-card" data-type="cats" data-gender="male" data-age="0-1">
-          <img src="https://images.unsplash.com/photo-1570129477492-45a003537e1f?w=300&h=300&fit=crop" alt="Cat">
-          <h6>ข้าวปิ้น</h6>
-          <p><span class="badge">แมว</span> <span class="badge">1 y</span></p>
-          <div class="pet-info">
-            <span>♂ เพศผู้</span>
-            <span>💚</span>
-          </div>
-          <button class="adopt-btn">รับเลี้ยง</button>
-        </div>
-
-        <div class="pet-card" data-type="dogs" data-gender="female" data-age="5+">
-          <img src="https://images.unsplash.com/photo-1601142634808-38ab7707aad4?w=300&h=300&fit=crop" alt="Dog">
-          <h6>คุณระ</h6>
-          <p><span class="badge">สุนัข</span> <span class="badge">9 y</span></p>
-          <div class="pet-info">
-            <span>♀ เพศเมีย</span>
-            <span>💚</span>
-          </div>
-          <button class="adopt-btn">รับเลี้ยง</button>
+       
         </div>
       </div>
     </div>
@@ -214,6 +172,46 @@ function filterPets() {
 document.querySelectorAll('.filter-select').forEach(select => {
   select.addEventListener('change', filterPets);
 });
+
+// Favorite function
+function toggleFavorite(element, petId, petName, petGender, petAge) {
+  let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+  const petData = { id: petId, name: petName, gender: petGender, age: petAge };
+  
+  const exists = favorites.find(pet => pet.id === petId);
+  
+  if (exists) {
+    // Remove from favorites
+    favorites = favorites.filter(pet => pet.id !== petId);
+    element.textContent = '🤍';
+  } else {
+    // Add to favorites
+    favorites.push(petData);
+    element.textContent = '❤️';
+  }
+  
+  localStorage.setItem('favorites', JSON.stringify(favorites));
+}
+
+// Load favorites on page load
+window.addEventListener('load', function() {
+  const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+  const cards = document.querySelectorAll('.pet-card');
+  
+  cards.forEach(card => {
+    const heartIcon = card.querySelector('.heart-icon');
+    const petId = card.getAttribute('data-petid');
+    
+    if (favorites.find(pet => pet.id === petId)) {
+      heartIcon.textContent = '❤️';
+    }
+  });
+});
+
+// Go to pet detail page
+function goToDetail(petId) {
+  window.location.href = '/pet/' + petId;
+}
 </script>
 
 </body>

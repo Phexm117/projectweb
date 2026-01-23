@@ -106,6 +106,7 @@ body {
   padding: 20px;
   border-radius: 15px;
   border: 1px solid #ddd;
+  text-align: center;
 }
 
 .filter-section h6 {
@@ -118,6 +119,7 @@ body {
   gap: 12px;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
 }
 
 .filter-select {
@@ -151,17 +153,18 @@ body {
 /* Pet Cards */
 .pet-cards-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 16px;
   margin-top: 20px;
 }
 
 .pet-card {
-  background: white;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   transition: transform 0.3s;
+  text-align: center;
+  padding: 12px;
 }
 
 .pet-card:hover {
@@ -171,22 +174,42 @@ body {
 
 .pet-card img {
   width: 100%;
-  height: 200px;
+  height: 150px;
   object-fit: cover;
+  border-radius: 15px;
+  margin-bottom: 8px;
 }
 
 .pet-card h6 {
-  padding: 12px 12px 0;
-  margin: 0;
+  padding: 0;
+  margin: 8px 0 4px 0;
   font-weight: 600;
   color: #333;
   font-size: 14px;
 }
 
 .pet-card p {
-  padding: 4px 12px;
-  margin: 0;
+  padding: 0;
+  margin: 0 0 8px 0;
   font-size: 12px;
+  color: #666;
+}
+
+.pet-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.badge-small {
+  background: #7fd1c2;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 11px;
+  font-weight: 600;
 }
 
 .pet-card .badge {
