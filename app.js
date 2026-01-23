@@ -68,6 +68,19 @@ app.get("/admin", requireLogin, (req, res) => {
   res.render("admin", { user: req.user });
 });
 
+// Pet detail page
+app.get("/pet/:id", requireLogin, (req, res) => {
+  const petId = req.params.id;
+  // Mock pet data - in real app, would fetch from database
+  const petData = {
+    id: petId,
+    name: "โคนัน",
+    gender: "♀",
+    age: "2Y"
+  };
+  res.render("pet-detail", { user: req.user, petData: petData });
+});
+
 app.get("/logout", (req, res) => {
   // Clear session
   if (req.cookies.sessionId) {
