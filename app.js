@@ -44,16 +44,16 @@ app.get("/", (req, res) => {
   res.render("landing");
 });
 
-app.get("/home", (req, res) => {
-  res.render("user_home");
+app.get("/home", requireLogin, (req, res) => {
+  res.render("user_home", { user: req.user });
 });
 
-app.get("/recommended", (req, res) => {
-  res.render("recommended");
+app.get("/recommended", requireLogin, (req, res) => {
+  res.render("recommended", { user: req.user });
 });
 
-app.get("/favorites", (req, res) => {
-  res.render("favorites");
+app.get("/favorites", requireLogin, (req, res) => {
+  res.render("favorites", { user: req.user });
 });
 
 app.get("/login", (req, res) => {
@@ -65,7 +65,16 @@ app.get("/signup", (req, res) => {
 });
 
 app.get("/admin", requireLogin, (req, res) => {
-  res.render("admin");
+  res.render("admin", { user: req.user });
+});
+
+app.get("/logout", (req, res) => {
+  // Clear session
+  if (req.cookies.sessionId) {
+    delete sessions[req.cookies.sessionId];
+  }
+  res.clearCookie("sessionId");
+  res.redirect("/login");
 });
 
 app.post("/login", (req, res) => {

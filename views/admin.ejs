@@ -24,14 +24,14 @@
     <a class="nav-link" href="/">ตั้งค่า</a>
 
     <div class="user-badge ms-3">
-      <span>Admin</span>
+      <span><%= user.name %></span>
       <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png">
     </div>
   </div>
 </nav>
 
 <!-- Dashboard Header -->
-<div class="admin-header">
+<div class="admin-header" style="background-image: url('/banner.png'); background-size: cover; background-position: center;">
   <h2>Dashboard</h2>
 </div>
 
@@ -185,7 +185,7 @@
         <div class="settings-content">
           <p>เปลี่ยนรหัสผ่าน (Change Password)</p>
           <p>ประวัติการเข้าใจงาน (Login Activity)</p>
-          <p>ออกจากระบบ (Logout)</p>
+          <a href="/logout" class="btn btn-danger" style="display: inline-block; margin-top: 20px;">ออกจากระบบ (Logout)</a>
         </div>
       </div>
     </div>
