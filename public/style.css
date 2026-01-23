@@ -54,7 +54,7 @@ body {
 
 /* Hero */
 .hero {
-  height: 420px;
+  height: 280px;
   background-size: cover;
   background-position: center;
   display: flex;
@@ -70,7 +70,7 @@ body {
 }
 
 .hero-text h2 {
-  font-size: 250px;
+  font-size: 140px;
   font-weight: bold;
   color: #333;
   margin: 0;
@@ -221,11 +221,11 @@ body {
 /* Landing Page */
 .landing-hero {
   background-color: #7fd1c2;
-  min-height: 100vh;
+  min-height: auto;
+  padding: 60px 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
 }
 
 .landing-content {
@@ -250,7 +250,7 @@ body {
 }
 
 .landing-content h1 {
-  font-size: 48px;
+  font-size: 36px;
   font-weight: bold;
   margin-bottom: 15px;
   color: white;

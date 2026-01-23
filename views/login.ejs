@@ -24,14 +24,22 @@
     <!-- Title -->
     <h3 class="auth-title">เข้าสู่ระบบ</h3>
 
+    <!-- Error Message -->
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <%= error %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% } %>
+
     <!-- Form -->
-    <form>
+    <form method="POST" action="/login">
       <div class="form-group">
-        <input type="email" class="auth-input" placeholder="📧 Email" required>
+        <input type="email" name="email" class="auth-input" placeholder="📧 Email" required>
       </div>
 
       <div class="form-group">
-        <input type="password" class="auth-input" placeholder="🔒 Password" required>
+        <input type="password" name="password" class="auth-input" placeholder="🔒 Password" required>
       </div>
 
       <a href="#" class="forgot-password">Forgot password?</a>
