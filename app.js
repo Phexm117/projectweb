@@ -1,8 +1,6 @@
-require('dotenv').config();
+require('dotenv').config({ override: true });
 const express = require("express");
-const mongoose = require('mongoose');
-const { sequelize } = require('./db/mysql');
-const User = require('./models/user');
+const { dbPromise } = require('./db/mysql');
 const multer = require('multer');
 const app = express();
 
@@ -38,42 +36,64 @@ app.use((req, res, next) => {
 // Session storage (in-memory)
 const sessions = {};
 
-// MongoDB connection (pets data)
-const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/projectweb';
-mongoose.connect(mongoUri).catch((err) => {
-  console.error('MongoDB connection error:', err.message);
-});
+// MySQL init + seed admin/user from env
+async function initMySql() {
+  try {
+    await dbPromise.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        username VARCHAR(255) NULL,
+        password VARCHAR(255) NOT NULL,
+        name VARCHAR(255) NULL,
+        role ENUM('user', 'admin') NOT NULL DEFAULT 'user'
+      )
+    `);
 
-// MySQL connection + seed admin/user from env
-sequelize
-  .authenticate()
-  .then(async () => {
-    await sequelize.sync();
+    async function ensureColumn(columnName, columnDefinition) {
+      const [columns] = await dbPromise.query(
+        `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'users'
+           AND COLUMN_NAME = ?`,
+        [columnName]
+      );
+      if (!columns || columns.length === 0) {
+        await dbPromise.query(`ALTER TABLE users ADD COLUMN ${columnDefinition}`);
+      }
+    }
+
+    await ensureColumn('password', "password VARCHAR(255) NOT NULL");
+    await ensureColumn('name', "name VARCHAR(255) NULL");
+    await ensureColumn('role', "role ENUM('user', 'admin') NOT NULL DEFAULT 'user'");
+
     const adminEmail = process.env.ADMIN_EMAIL;
     const adminPassword = process.env.ADMIN_PASSWORD;
     if (adminEmail && adminPassword) {
-      await User.upsert({
-        email: adminEmail,
-        password: adminPassword,
-        name: process.env.ADMIN_NAME || 'admin',
-        role: 'admin'
-      });
+      await dbPromise.query(
+        `INSERT INTO users (email, password, name, role)
+         VALUES (?, ?, ?, 'admin')
+         ON DUPLICATE KEY UPDATE password = VALUES(password), name = VALUES(name), role = 'admin'`,
+        [adminEmail, adminPassword, process.env.ADMIN_NAME || 'admin']
+      );
     }
 
     const userEmail = process.env.USER_EMAIL;
     const userPassword = process.env.USER_PASSWORD;
     if (userEmail && userPassword) {
-      await User.upsert({
-        email: userEmail,
-        password: userPassword,
-        name: process.env.USER_NAME || 'user',
-        role: 'user'
-      });
+      await dbPromise.query(
+        `INSERT INTO users (email, password, name, role)
+         VALUES (?, ?, ?, 'user')
+         ON DUPLICATE KEY UPDATE password = VALUES(password), name = VALUES(name), role = 'user'`,
+        [userEmail, userPassword, process.env.USER_NAME || 'user']
+      );
     }
-  })
-  .catch((err) => {
-    console.error('MySQL connection error:', err.message);
-  });
+  } catch (err) {
+    console.error('MySQL init error:', err.message);
+  }
+}
+
+initMySql();
 
 // Middleware to check session
 function requireLogin(req, res, next) {
@@ -146,23 +166,26 @@ app.get("/logout", (req, res) => {
   res.redirect("/login");
 });
 
-app.post("/login", (req, res) => {
-  const { email, password } = req.body;
-  User.findOne({ where: { email } })
-    .then((user) => {
-      if (!user) {
-        return res.render("user/login", { error: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" });
-      }
-      if (user.password !== password) {
-        return res.render("user/login", { error: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" });
-      }
-      const sessionId = Math.random().toString(36).substring(7);
-      sessions[sessionId] = { user: { id: user.id, name: user.name, role: user.role } };
-      res.cookie("sessionId", sessionId, { httpOnly: true });
-      if (user.role === "admin") return res.redirect("/admin");
-      return res.redirect("/home");
-    })
-    .catch(() => res.render("user/login", { error: "ระบบมีปัญหา โปรดลองอีกครั้ง" }));
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const [rows] = await dbPromise.query(
+      'SELECT id, name, role, password FROM users WHERE email = ? LIMIT 1',
+      [email]
+    );
+    const user = rows && rows[0];
+    if (!user || user.password !== password) {
+      return res.render("user/login", { error: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" });
+    }
+    const sessionId = Math.random().toString(36).substring(7);
+    sessions[sessionId] = { user: { id: user.id, name: user.name, role: user.role } };
+    res.cookie("sessionId", sessionId, { httpOnly: true });
+    if (user.role === "admin") return res.redirect("/admin");
+    return res.redirect("/home");
+  } catch (err) {
+    console.error('Login error:', err.message);
+    return res.render("user/login", { error: "ระบบมีปัญหา โปรดลองอีกครั้ง" });
+  }
 });
 
 // Admin add pet
