@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- ===== Page: Admin Edit Pet ===== -->
 <html lang="th">
 <head>
   <meta charset="UTF-8">
@@ -51,33 +52,114 @@
       <h5 class="mb-4">แก้ไขข้อมูลสัตว์เลี้ยง</h5>
       <form action="/admin/edit-pet" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="id" value="<%= pet.id %>">
-        <div class="mb-3">
-          <label for="name" class="form-label">ชื่อ</label>
-          <input type="text" class="form-control" id="name" name="name" value="<%= pet.name %>" required>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="name" class="form-label">ชื่อสัตว์เลี้ยง</label>
+            <input type="text" class="form-control" id="name" name="name" value="<%= pet.name %>" required>
+          </div>
+          <div class="col-md-6">
+            <label for="type" class="form-label">ประเภทสัตว์เลี้ยง</label>
+            <select class="form-control" id="type" name="type" required>
+              <option value="cats" <%= pet.type === 'cats' ? 'selected' : '' %>>แมว</option>
+              <option value="dogs" <%= pet.type === 'dogs' ? 'selected' : '' %>>สุนัข</option>
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label for="gender" class="form-label">เพศ</label>
+            <select class="form-control" id="gender" name="gender" required>
+              <option value="male" <%= (pet.gender === 'male' || pet.gender === '♂') ? 'selected' : '' %>>เพศผู้</option>
+              <option value="female" <%= (pet.gender === 'female' || pet.gender === '♀') ? 'selected' : '' %>>เพศเมีย</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="age_year" class="form-label">อายุ (ปี)</label>
+            <input type="number" min="0" class="form-control" id="age_year" name="age_year" value="<%= pet.ageYear || 0 %>" required>
+          </div>
+          <div class="col-md-3">
+            <label for="age_month" class="form-label">อายุ (เดือน)</label>
+            <input type="number" min="0" max="11" class="form-control" id="age_month" name="age_month" value="<%= pet.ageMonth || 0 %>" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">รหัสสัตว์ ID</label>
+            <div class="form-control" style="background: #f6f6f6; color: #777;"><%= pet.petId || '-' %></div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label d-block">ทำหมัน</label>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="sterilized" id="sterilized_yes" value="yes" <%= pet.sterilized === 'yes' ? 'checked' : '' %> required>
+              <label class="form-check-label" for="sterilized_yes">ทำแล้ว</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="sterilized" id="sterilized_no" value="no" <%= pet.sterilized === 'no' ? 'checked' : '' %> required>
+              <label class="form-check-label" for="sterilized_no">ยังไม่ทำ</label>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="vaccinated" class="form-label">วัคซีน</label>
+            <select class="form-control" id="vaccinated" name="vaccinated" required>
+              <option value="yes" <%= pet.vaccinated === 'yes' ? 'selected' : '' %>>ฉีดแล้ว</option>
+              <option value="no" <%= pet.vaccinated === 'no' ? 'selected' : '' %>>ยังไม่ฉีด</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="post_status" class="form-label">สถานะโพสต์</label>
+            <select class="form-control" id="post_status" name="post_status" required>
+              <option value="open" <%= pet.postStatus === 'open' ? 'selected' : '' %>>เปิดโพสต์</option>
+              <option value="close" <%= pet.postStatus === 'close' ? 'selected' : '' %>>ปิดโพสต์</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="adoption_status" class="form-label">สถานะการรับเลี้ยง</label>
+            <select class="form-control" id="adoption_status" name="adoption_status" required>
+              <option value="available" <%= pet.adoptionStatus === 'available' ? 'selected' : '' %>>พร้อมรับเลี้ยง</option>
+              <option value="adopted" <%= pet.adoptionStatus === 'adopted' ? 'selected' : '' %>>ได้รับการรับเลี้ยงแล้ว</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="color" class="form-label">สี</label>
+            <select class="form-control" id="color" name="color">
+              <option value="" <%= !pet.color ? 'selected' : '' %>>-เลือก-</option>
+              <option value="White" <%= pet.color === 'White' ? 'selected' : '' %>>White</option>
+              <option value="Black" <%= pet.color === 'Black' ? 'selected' : '' %>>Black</option>
+              <option value="Brown" <%= pet.color === 'Brown' ? 'selected' : '' %>>Brown</option>
+              <option value="Gray" <%= pet.color === 'Gray' ? 'selected' : '' %>>Gray</option>
+              <option value="Orange" <%= pet.color === 'Orange' ? 'selected' : '' %>>Orange</option>
+              <option value="Calico" <%= pet.color === 'Calico' ? 'selected' : '' %>>Calico</option>
+              <option value="Tabby" <%= pet.color === 'Tabby' ? 'selected' : '' %>>Tabby</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="image1" class="form-label">รูปภาพ 1 (เว้นว่างหากไม่เปลี่ยน)</label>
+            <input type="file" class="form-control" id="image1" name="image1" accept="image/*">
+          </div>
+          <div class="col-md-6">
+            <label for="image2" class="form-label">รูปภาพ 2 (เว้นว่างหากไม่เปลี่ยน)</label>
+            <input type="file" class="form-control" id="image2" name="image2" accept="image/*">
+          </div>
+          <div class="col-md-6">
+            <label for="image3" class="form-label">รูปภาพ 3 (เว้นว่างหากไม่เปลี่ยน)</label>
+            <input type="file" class="form-control" id="image3" name="image3" accept="image/*">
+          </div>
+
+          <div class="col-12">
+            <label for="details" class="form-label">ข้อมูลสัตว์เลี้ยง</label>
+            <textarea class="form-control" id="details" name="details" rows="3" placeholder="คำอธิบาย / นิสัย"><%= pet.details || '' %></textarea>
+          </div>
+
+          <div class="col-12 d-flex gap-2">
+            <button type="submit" class="btn btn-primary">แก้ไข</button>
+            <form action="/admin/delete-pet" method="POST" onsubmit="return confirm('ลบข้อมูลสัตว์เลี้ยงนี้ใช่หรือไม่?');">
+              <input type="hidden" name="id" value="<%= pet.id %>">
+              <button type="submit" class="btn btn-danger">ลบ</button>
+            </form>
+          </div>
         </div>
-        <div class="mb-3">
-          <label for="type" class="form-label">ประเภท</label>
-          <select class="form-control" id="type" name="type" required>
-            <option value="cats" <%= pet.type === 'cats' ? 'selected' : '' %>>แมว</option>
-            <option value="dogs" <%= pet.type === 'dogs' ? 'selected' : '' %>>สุนัข</option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <label for="gender" class="form-label">เพศ</label>
-          <select class="form-control" id="gender" name="gender" required>
-            <option value="♂" <%= pet.gender === '♂' ? 'selected' : '' %>>เพศผู้</option>
-            <option value="♀" <%= pet.gender === '♀' ? 'selected' : '' %>>เพศเมีย</option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <label for="age" class="form-label">อายุ</label>
-          <input type="text" class="form-control" id="age" name="age" value="<%= pet.age %>" required>
-        </div>
-        <div class="mb-3">
-          <label for="image" class="form-label">รูปภาพ (เว้นว่างหากไม่เปลี่ยน)</label>
-          <input type="file" class="form-control" id="image" name="image" accept="image/*">
-        </div>
-        <button type="submit" class="btn btn-primary">แก้ไข</button>
       </form>
     </div>
   </div>

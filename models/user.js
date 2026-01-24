@@ -1,3 +1,4 @@
+// ===== User model (Sequelize) =====
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../db/mysql');
 

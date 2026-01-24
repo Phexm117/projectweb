@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- ===== Page: Recommended (user) ===== -->
 <html lang="th">
 <head>
   <meta charset="UTF-8">
@@ -25,7 +26,7 @@
     <a class="nav-link" href="/favorites">รายการโปรด</a>
 
     <div class="user-badge ms-3">
-      <span>Kittisak</span>
+      <span><%= (user && user.name) ? user.name : '' %></span>
       <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png">
     </div>
   </div>
@@ -52,10 +53,17 @@
       <!-- Pet Cards -->
       <div class="pet-cards-container">
         <% pets.forEach(pet => { %>
-        <div class="pet-card" onclick="location.href='/pet/<%= pet.id %>'" style="cursor: pointer;">
+        <div class="pet-card" data-petid="<%= pet.id %>" onclick="location.href='/pet/<%= pet.id %>'" style="cursor: pointer;">
           <img src="<%= pet.image %>" alt="<%= pet.name %>">
+          <span class="heart-icon" onclick="event.stopPropagation(); toggleFavorite(this, '<%= pet.id %>')">🤍</span>
           <h6><%= pet.name %></h6>
-          <p><%= pet.gender %> <%= pet.gender === '♀' ? 'เพศเมีย' : 'เพศผู้' %> <%= pet.age %> 💉</p>
+          <small class="text-muted">รหัส: <%= pet.petId || '-' %></small>
+          <p>
+            <%= (pet.gender === 'female' || pet.gender === '♀') ? '♀' : '♂' %>
+            <%= (pet.gender === 'female' || pet.gender === '♀') ? 'เพศเมีย' : 'เพศผู้' %>
+            <%= pet.age %> 🎂
+            <% if ((pet.vaccinated || '').toLowerCase() === 'yes') { %> 💉 <% } %>
+          </p>
           <div class="pet-footer">
             <span class="badge-small" onclick="event.stopPropagation(); location.href='/pet/<%= pet.id %>'">รายละเอียด</span>
           </div>
@@ -76,35 +84,27 @@
 
 <script>
 // Favorite function
-function toggleFavorite(element, petId, petName, petGender, petAge) {
-  let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-  const petData = { id: petId, name: petName, gender: petGender, age: petAge };
-  
-  const exists = favorites.find(pet => pet.id === petId);
-  
-  if (exists) {
-    // Remove from favorites
-    favorites = favorites.filter(pet => pet.id !== petId);
-    element.textContent = '🤍';
-  } else {
-    // Add to favorites
-    favorites.push(petData);
-    element.textContent = '❤️';
+async function toggleFavorite(element, petId) {
+  const body = new URLSearchParams({ petId });
+  const response = await fetch('/favorites/toggle', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body
+  });
+  const data = await response.json();
+  if (data && data.success) {
+    element.textContent = data.favorited ? '❤️' : '🤍';
   }
-  
-  localStorage.setItem('favorites', JSON.stringify(favorites));
 }
 
 // Load favorites on page load
 window.addEventListener('load', function() {
-  const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+  const favorites = <%- JSON.stringify(favoriteIds || []) %>;
   const cards = document.querySelectorAll('.pet-card');
-  
   cards.forEach(card => {
     const heartIcon = card.querySelector('.heart-icon');
     const petId = card.getAttribute('data-petid');
-    
-    if (favorites.find(pet => pet.id === petId)) {
+    if (favorites.includes(petId)) {
       heartIcon.textContent = '❤️';
     }
   });

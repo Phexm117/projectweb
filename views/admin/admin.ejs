@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- ===== Page: Admin Dashboard ===== -->
 <html lang="th">
 <head>
   <meta charset="UTF-8">
@@ -19,9 +20,9 @@
   </div>
 
   <div class="d-flex align-items-center">
-    <a class="nav-link" href="/">จัดการข้อมูลสัตว์เลี้ยง</a>
-    <a class="nav-link" href="/">ค้นหาสัตว์</a>
-    <a class="nav-link" href="/">ตั้งค่า</a>
+    <a class="nav-link <%= activeTab === 'pets' ? 'active' : '' %>" href="/admin?tab=pets">จัดการข้อมูลสัตว์เลี้ยง</a>
+    <a class="nav-link <%= activeTab === 'search' ? 'active' : '' %>" href="/admin?tab=search">ค้นหาสัตว์</a>
+    <a class="nav-link <%= activeTab === 'settings' ? 'active' : '' %>" href="/admin?tab=settings">ตั้งค่า</a>
 
     <div class="user-badge ms-3">
       <span><%= user.name %></span>
@@ -40,16 +41,16 @@
     <!-- Sidebar -->
     <div class="col-3">
       <div class="admin-sidebar">
-        <button class="admin-menu active" onclick="showTab('pets')">จัดการข้อมูลสัตว์เลี้ยง</button>
-        <button class="admin-menu" onclick="showTab('add')">ค้นหาสัตว์</button>
-        <button class="admin-menu" onclick="showTab('settings')">ตั้งค่า</button>
+        <button class="admin-menu <%= activeTab === 'pets' ? 'active' : '' %>" onclick="showTab('pets')">จัดการข้อมูลสัตว์เลี้ยง</button>
+        <button class="admin-menu <%= activeTab === 'search' ? 'active' : '' %>" onclick="showTab('search')">ค้นหาสัตว์</button>
+        <button class="admin-menu <%= activeTab === 'settings' ? 'active' : '' %>" onclick="showTab('settings')">ตั้งค่า</button>
       </div>
     </div>
 
     <!-- Content -->
     <div class="col-9">
       <!-- Tab 1: Manage Pets -->
-      <div id="petsTab" class="admin-tab">
+      <div id="petsTab" class="admin-tab" style="display: <%= activeTab === 'pets' ? 'block' : 'none' %>;">
         <h5 class="mb-4">รายชื่อสัตว์เลี้ยง <button class="btn btn-add" onclick="location.href='/admin/add-pet'">+ Add Pet</button></h5>
         
         <div class="pet-list">
@@ -58,96 +59,212 @@
             <img src="<%= pet.image %>" alt="Pet">
             <div class="pet-details">
               <h6><%= pet.name %></h6>
-              <p><%= pet.type === 'cats' ? 'น้องแมว' : 'น้องสุนัข' %> รหัส: <%= pet.id %><br><%= pet.gender %> <%= pet.gender === '♀' ? 'เพศเมีย' : 'เพศผู้' %> อายุ <%= pet.age %></p>
+              <p>
+                <%= pet.type === 'cats' ? 'น้องแมว' : 'น้องสุนัข' %> รหัส: <%= pet.petId || pet.id %><br>
+                <%= (pet.gender === 'female' || pet.gender === '♀') ? 'เพศเมีย' : 'เพศผู้' %>
+                อายุ <%= pet.age %>
+                <br>
+                วันที่เพิ่ม: <%= pet.createdAt ? new Date(pet.createdAt).toLocaleString('th-TH') : '-' %>
+              </p>
               <div class="pet-status">
-                <span class="status-health">✓ พร้อมรับเลี้ยง</span>
-                <span class="status-toggle">
-                  <input type="checkbox" checked>
+                <span class="status-health <%= pet.adoptionStatus === 'adopted' ? 'status-adopted' : '' %>">
+                  <%= pet.adoptionStatus === 'adopted' ? '✗ ได้รับการรับเลี้ยงแล้ว' : '✓ พร้อมรับเลี้ยง' %>
                 </span>
-                <span class="status-toggle">
-                  <input type="checkbox" checked>
+                <span class="status-post <%= pet.postStatus === 'close' ? 'status-closed' : 'status-open' %>">
+                  <%= pet.postStatus === 'close' ? 'ปิดโพสต์' : 'เปิดโพสต์' %>
                 </span>
               </div>
             </div>
-            <button class="btn btn-edit" onclick="location.href='/admin/edit-pet?id=<%= pet.id %>'">Edit</button>
+            <div class="d-flex gap-2">
+              <form action="/admin/toggle-post-status" method="POST">
+                <input type="hidden" name="id" value="<%= pet.id %>">
+                <input type="hidden" name="nextStatus" value="<%= pet.postStatus === 'open' ? 'close' : 'open' %>">
+                <input type="hidden" name="tab" value="pets">
+                <button type="submit" class="btn btn-secondary">
+                  <%= pet.postStatus === 'open' ? 'ปิดโพสต์' : 'เปิดโพสต์' %>
+                </button>
+              </form>
+              <button class="btn btn-edit" onclick="location.href='/admin/edit-pet?id=<%= pet.id %>'">Edit</button>
+              <form action="/admin/delete-pet" method="POST" onsubmit="return confirm('ลบข้อมูลสัตว์เลี้ยงนี้ใช่หรือไม่?');">
+                <input type="hidden" name="id" value="<%= pet.id %>">
+                <button type="submit" class="btn btn-danger">Delete</button>
+              </form>
+            </div>
           </div>
           <% }); %>
         </div>
       </div>
 
       <!-- Tab 2: Add Pet -->
-      <div id="addTab" class="admin-tab" style="display: none;">
-        <h5 class="mb-4">ค้นหาสัตว์</h5>
-        
-        <div class="add-form">
-          <div class="form-row">
-            <div class="form-group">
-              <label>ชื่อ</label>
-              <input type="text" placeholder="กรอกชื่อ" class="form-input">
-            </div>
-            <div class="form-group">
-              <label>code</label>
-              <input type="text" placeholder="กรอกรหัส" class="form-input">
-            </div>
+      <div id="searchTab" class="admin-tab" style="display: <%= activeTab === 'search' ? 'block' : 'none' %>;">
+        <div class="admin-search-card">
+          <h5 class="admin-search-title">ค้นหาสัตว์</h5>
+          <form class="filter-form admin-search-form" method="GET" action="/admin">
+          <input type="hidden" name="tab" value="search">
+          <div class="filter-row">
+            <input class="filter-input" type="text" name="name" placeholder="ชื่อสัตว์เลี้ยง" value="<%= filters?.name || '' %>">
+            <input class="filter-input" type="text" name="pet_id" placeholder="รหัสสัตว์ ID" value="<%= filters?.pet_id || '' %>">
+
+            <select class="filter-input" name="type">
+              <option value="">-ประเภททั้งหมด-</option>
+              <option value="dogs" <%= filters?.type === 'dogs' ? 'selected' : '' %>>Dogs</option>
+              <option value="cats" <%= filters?.type === 'cats' ? 'selected' : '' %>>Cats</option>
+            </select>
+
+            <select class="filter-input" name="gender">
+              <option value="">-เพศทั้งหมด-</option>
+              <option value="male" <%= filters?.gender === 'male' ? 'selected' : '' %>>Male</option>
+              <option value="female" <%= filters?.gender === 'female' ? 'selected' : '' %>>Female</option>
+            </select>
+
+            <select class="filter-input" name="age">
+              <option value="">-อายุทั้งหมด-</option>
+              <option value="0-1" <%= filters?.age === '0-1' ? 'selected' : '' %>>0-1 years</option>
+              <option value="1-3" <%= filters?.age === '1-3' ? 'selected' : '' %>>1-3 years</option>
+              <option value="3-5" <%= filters?.age === '3-5' ? 'selected' : '' %>>3-5 years</option>
+              <option value="5+" <%= filters?.age === '5+' ? 'selected' : '' %>>5 years+</option>
+            </select>
+
+            <select class="filter-input" name="sterilized">
+              <option value="">-ทำหมันทั้งหมด-</option>
+              <option value="yes" <%= filters?.sterilized === 'yes' ? 'selected' : '' %>>ทำแล้ว</option>
+              <option value="no" <%= filters?.sterilized === 'no' ? 'selected' : '' %>>ยังไม่ทำ</option>
+            </select>
           </div>
 
-          <div class="form-filters">
-            <label>type</label>
-            <select class="form-select">
-              <option>-เลือก-</option>
-              <option>Dogs</option>
-              <option>Cats</option>
+          <div class="filter-row">
+            <select class="filter-input" name="adoption_status">
+              <option value="">-สถานะการรับเลี้ยง-</option>
+              <option value="available" <%= filters?.adoption_status === 'available' ? 'selected' : '' %>>พร้อมรับเลี้ยง</option>
+              <option value="adopted" <%= filters?.adoption_status === 'adopted' ? 'selected' : '' %>>ได้รับการรับเลี้ยงแล้ว</option>
             </select>
 
-            <label>Gender</label>
-            <select class="form-select">
-              <option>-เลือก-</option>
-              <option>Male</option>
-              <option>Female</option>
+            <select class="filter-input" name="post_status">
+              <option value="">-สถานะโพสต์-</option>
+              <option value="open" <%= filters?.post_status === 'open' ? 'selected' : '' %>>เปิดโพสต์</option>
+              <option value="close" <%= filters?.post_status === 'close' ? 'selected' : '' %>>ปิดโพสต์</option>
+            </select>
+            
+            <select class="filter-input" name="color">
+              <option value="">-สีทั้งหมด-</option>
+              <option value="White" <%= filters?.color === 'White' ? 'selected' : '' %>>White</option>
+              <option value="Black" <%= filters?.color === 'Black' ? 'selected' : '' %>>Black</option>
+              <option value="Brown" <%= filters?.color === 'Brown' ? 'selected' : '' %>>Brown</option>
+              <option value="Gray" <%= filters?.color === 'Gray' ? 'selected' : '' %>>Gray</option>
+              <option value="Orange" <%= filters?.color === 'Orange' ? 'selected' : '' %>>Orange</option>
+              <option value="Calico" <%= filters?.color === 'Calico' ? 'selected' : '' %>>Calico</option>
+              <option value="Tabby" <%= filters?.color === 'Tabby' ? 'selected' : '' %>>Tabby</option>
             </select>
 
-            <label>Age</label>
-            <select class="form-select">
-              <option>-เลือก-</option>
-              <option>0-1 years</option>
-              <option>1-3 years</option>
-              <option>3-5 years</option>
-            </select>
-
-            <label>Health</label>
-            <select class="form-select">
-              <option>-เลือก-</option>
-              <option>Healthy</option>
-              <option>Problem</option>
-            </select>
-
-            <label>Color</label>
-            <select class="form-select">
-              <option>-เลือก-</option>
-              <option>White</option>
-              <option>Black</option>
-              <option>Brown</option>
-            </select>
-
-            <label>Status</label>
-            <select class="form-select">
-              <option>-เลือก-</option>
-              <option>Available</option>
-              <option>Adopted</option>
-            </select>
-
-            <button class="btn btn-search">🔍 ค้นหา</button>
+            <button class="search-btn" type="submit">🔍 ค้นหา</button>
           </div>
+          </form>
+        </div>
+
+        <div class="pet-list" style="margin-top: 24px;">
+          <% if (pets.length === 0) { %>
+            <div class="text-center text-muted" style="padding: 20px;">ไม่พบข้อมูล</div>
+          <% } %>
+          <% pets.forEach(pet => { %>
+          <div class="pet-item">
+            <img src="<%= pet.image %>" alt="Pet">
+            <div class="pet-details">
+              <h6><%= pet.name %></h6>
+              <p>
+                <%= pet.type === 'cats' ? 'น้องแมว' : 'น้องสุนัข' %> รหัส: <%= pet.petId || pet.id %><br>
+                <%= (pet.gender === 'female' || pet.gender === '♀') ? 'เพศเมีย' : 'เพศผู้' %>
+                อายุ <%= pet.age %>
+                <br>
+                วันที่เพิ่ม: <%= pet.createdAt ? new Date(pet.createdAt).toLocaleString('th-TH') : '-' %>
+              </p>
+            </div>
+            <div class="d-flex gap-2">
+              <form action="/admin/toggle-post-status" method="POST">
+                <input type="hidden" name="id" value="<%= pet.id %>">
+                <input type="hidden" name="nextStatus" value="<%= pet.postStatus === 'open' ? 'close' : 'open' %>">
+                <input type="hidden" name="tab" value="search">
+                <button type="submit" class="btn btn-secondary">
+                  <%= pet.postStatus === 'open' ? 'ปิดโพสต์' : 'เปิดโพสต์' %>
+                </button>
+              </form>
+              <button class="btn btn-edit" onclick="location.href='/admin/edit-pet?id=<%= pet.id %>'">Edit</button>
+              <form action="/admin/delete-pet" method="POST" onsubmit="return confirm('ลบข้อมูลสัตว์เลี้ยงนี้ใช่หรือไม่?');">
+                <input type="hidden" name="id" value="<%= pet.id %>">
+                <button type="submit" class="btn btn-danger">Delete</button>
+              </form>
+            </div>
+          </div>
+          <% }); %>
         </div>
       </div>
 
       <!-- Tab 3: Settings -->
-      <div id="settingsTab" class="admin-tab" style="display: none;">
+      <div id="settingsTab" class="admin-tab" style="display: <%= activeTab === 'settings' ? 'block' : 'none' %>;">
         <h5 class="mb-4">ตั้งค่า</h5>
         
         <div class="settings-content">
-          <p>เปลี่ยนรหัสผ่าน (Change Password)</p>
-          <p>ประวัติการเข้าใจงาน (Login Activity)</p>
+          <div class="mb-4">
+            <button class="btn btn-primary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#changePasswordForm" aria-expanded="false" aria-controls="changePasswordForm">
+              เปลี่ยนรหัสผ่าน (Change Password)
+            </button>
+
+            <div class="collapse" id="changePasswordForm">
+              <% if (settingsError) { %>
+                <div class="alert alert-danger"><%= settingsError %></div>
+              <% } %>
+              <% if (settingsSuccess) { %>
+                <div class="alert alert-success"><%= settingsSuccess %></div>
+              <% } %>
+
+              <form method="POST" action="/admin/change-password" class="row g-3">
+                <div class="col-md-6">
+                  <input type="password" name="currentPassword" class="form-control" placeholder="รหัสผ่านเดิม" required>
+                </div>
+                <div class="col-md-6"></div>
+                <div class="col-md-6">
+                  <input type="password" name="newPassword" class="form-control" placeholder="รหัสผ่านใหม่" required>
+                </div>
+                <div class="col-md-6">
+                  <input type="password" name="confirmPassword" class="form-control" placeholder="ยืนยันรหัสผ่านใหม่" required>
+                </div>
+                <div class="col-12">
+                  <button type="submit" class="btn btn-primary">บันทึกรหัสผ่านใหม่</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div>
+            <button class="btn btn-secondary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#loginActivityTable" aria-expanded="false" aria-controls="loginActivityTable">
+              ประวัติการเข้าใช้งาน (Login Activity)
+            </button>
+            <div class="collapse" id="loginActivityTable">
+              <% if (loginActivity && loginActivity.length > 0) { %>
+                <div class="table-responsive">
+                  <table class="table table-sm align-middle">
+                    <thead>
+                      <tr>
+                        <th>เวลาเข้าใช้งาน</th>
+                        <th>IP</th>
+                        <th>อุปกรณ์/เบราว์เซอร์</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% loginActivity.forEach(activity => { %>
+                        <tr>
+                          <td><%= new Date(activity.loggedInAt).toLocaleString('th-TH') %></td>
+                          <td><%= activity.ipAddress || '-' %></td>
+                          <td style="max-width: 420px; white-space: normal;"><%= activity.userAgent || '-' %></td>
+                        </tr>
+                      <% }); %>
+                    </tbody>
+                  </table>
+                </div>
+              <% } else { %>
+                <div class="text-muted">ยังไม่มีประวัติการเข้าใช้งาน</div>
+              <% } %>
+            </div>
+          </div>
           <a href="/logout" class="btn btn-danger" style="display: inline-block; margin-top: 20px;">ออกจากระบบ (Logout)</a>
         </div>
       </div>
@@ -162,7 +279,7 @@
 function showTab(tabName) {
   // Hide all tabs
   document.getElementById('petsTab').style.display = 'none';
-  document.getElementById('addTab').style.display = 'none';
+  document.getElementById('searchTab').style.display = 'none';
   document.getElementById('settingsTab').style.display = 'none';
 
   // Remove active class from all buttons
@@ -175,8 +292,8 @@ function showTab(tabName) {
   if (tabName === 'pets') {
     document.getElementById('petsTab').style.display = 'block';
     buttons[0].classList.add('active');
-  } else if (tabName === 'add') {
-    document.getElementById('addTab').style.display = 'block';
+  } else if (tabName === 'search') {
+    document.getElementById('searchTab').style.display = 'block';
     buttons[1].classList.add('active');
   } else if (tabName === 'settings') {
     document.getElementById('settingsTab').style.display = 'block';

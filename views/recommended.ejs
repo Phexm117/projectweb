@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- ===== Page: Recommended (public) ===== -->
 <html lang="th">
 <head>
   <meta charset="UTF-8">
@@ -25,7 +26,7 @@
     <a class="nav-link" href="/favorites">รายการโปรด</a>
 
     <div class="user-badge ms-3">
-      <span>Kittisak</span>
+      <span><%= (user && user.name) ? user.name : '' %></span>
       <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png">
     </div>
   </div>

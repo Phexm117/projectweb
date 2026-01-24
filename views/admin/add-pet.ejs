@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- ===== Page: Admin Add Pet ===== -->
 <html lang="th">
 <head>
   <meta charset="UTF-8">
@@ -50,33 +51,110 @@
     <div class="col-9">
       <h5 class="mb-4">เพิ่มสัตว์เลี้ยงใหม่</h5>
       <form action="/admin/add-pet" method="POST" enctype="multipart/form-data">
-        <div class="mb-3">
-          <label for="name" class="form-label">ชื่อ</label>
-          <input type="text" class="form-control" id="name" name="name" required>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="name" class="form-label">ชื่อสัตว์เลี้ยง</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+          </div>
+          <div class="col-md-6">
+            <label for="type" class="form-label">ประเภทสัตว์เลี้ยง</label>
+            <select class="form-control" id="type" name="type" required>
+              <option value="cats">แมว</option>
+              <option value="dogs">สุนัข</option>
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label for="gender" class="form-label">เพศ</label>
+            <select class="form-control" id="gender" name="gender" required>
+              <option value="male">เพศผู้</option>
+              <option value="female">เพศเมีย</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="age_year" class="form-label">อายุ (ปี)</label>
+            <input type="number" min="0" class="form-control" id="age_year" name="age_year" required>
+          </div>
+          <div class="col-md-3">
+            <label for="age_month" class="form-label">อายุ (เดือน)</label>
+            <input type="number" min="0" max="11" class="form-control" id="age_month" name="age_month" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">รหัสสัตว์ ID</label>
+            <div class="form-control" style="background: #f6f6f6; color: #777;">กำหนดอัตโนมัติหลังบันทึก</div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label d-block">ทำหมัน</label>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="sterilized" id="sterilized_yes" value="yes" required>
+              <label class="form-check-label" for="sterilized_yes">ทำแล้ว</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="sterilized" id="sterilized_no" value="no" required>
+              <label class="form-check-label" for="sterilized_no">ยังไม่ทำ</label>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="vaccinated" class="form-label">วัคซีน</label>
+            <select class="form-control" id="vaccinated" name="vaccinated" required>
+              <option value="yes">ฉีดแล้ว</option>
+              <option value="no">ยังไม่ฉีด</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="post_status" class="form-label">สถานะโพสต์</label>
+            <select class="form-control" id="post_status" name="post_status" required>
+              <option value="open">เปิดโพสต์</option>
+              <option value="close">ปิดโพสต์</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="adoption_status" class="form-label">สถานะการรับเลี้ยง</label>
+            <select class="form-control" id="adoption_status" name="adoption_status" required>
+              <option value="available">พร้อมรับเลี้ยง</option>
+              <option value="adopted">ได้รับการรับเลี้ยงแล้ว</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="color" class="form-label">สี</label>
+            <select class="form-control" id="color" name="color">
+              <option value="">-เลือก-</option>
+              <option value="White">White</option>
+              <option value="Black">Black</option>
+              <option value="Brown">Brown</option>
+              <option value="Gray">Gray</option>
+              <option value="Orange">Orange</option>
+              <option value="Calico">Calico</option>
+              <option value="Tabby">Tabby</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="image1" class="form-label">รูปภาพ 1</label>
+            <input type="file" class="form-control" id="image1" name="image1" accept="image/*" required>
+          </div>
+          <div class="col-md-6">
+            <label for="image2" class="form-label">รูปภาพ 2</label>
+            <input type="file" class="form-control" id="image2" name="image2" accept="image/*">
+          </div>
+          <div class="col-md-6">
+            <label for="image3" class="form-label">รูปภาพ 3</label>
+            <input type="file" class="form-control" id="image3" name="image3" accept="image/*">
+          </div>
+
+          <div class="col-12">
+            <label for="details" class="form-label">ข้อมูลสัตว์เลี้ยง</label>
+            <textarea class="form-control" id="details" name="details" rows="3" placeholder="คำอธิบาย / นิสัย"></textarea>
+          </div>
+
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary">บันทึก</button>
+          </div>
         </div>
-        <div class="mb-3">
-          <label for="type" class="form-label">ประเภท</label>
-          <select class="form-control" id="type" name="type" required>
-            <option value="cats">แมว</option>
-            <option value="dogs">สุนัข</option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <label for="gender" class="form-label">เพศ</label>
-          <select class="form-control" id="gender" name="gender" required>
-            <option value="♂">เพศผู้</option>
-            <option value="♀">เพศเมีย</option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <label for="age" class="form-label">อายุ</label>
-          <input type="text" class="form-control" id="age" name="age" required>
-        </div>
-        <div class="mb-3">
-          <label for="image" class="form-label">รูปภาพ</label>
-          <input type="file" class="form-control" id="image" name="image" accept="image/*">
-        </div>
-        <button type="submit" class="btn btn-primary">เพิ่ม</button>
       </form>
     </div>
   </div>

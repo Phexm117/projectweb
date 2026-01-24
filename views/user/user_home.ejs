@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- ===== Page: User Home ===== -->
 <html lang="th">
 <head>
   <meta charset="UTF-8">
@@ -26,7 +27,7 @@
     <a class="nav-link" href="/favorites">รายการโปรด</a>
 
     <div class="user-badge ms-3">
-      <span>Kittisak</span>
+      <span><%= (user && user.name) ? user.name : '' %></span>
       <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png">
     </div>
   </div>
@@ -49,61 +50,76 @@
     <div class="col-9">
       <!-- Filter Section -->
       <div class="filter-section mb-4">
-        <h6 class="mb-3">Filter</h6>
-        <div class="filter-container">
-          <select class="filter-select" id="typeFilter">
-            <option value="">-ทั้งหมด-</option>
-            <option value="dogs">Dogs</option>
-            <option value="cats">Cats</option>
-          </select>
-          
-          <select class="filter-select" id="genderFilter">
-            <option value="">-ทั้งหมด-</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-          
-          <select class="filter-select" id="ageFilter">
-            <option value="">-ทั้งหมด-</option>
-            <option value="0-1">0-1 years</option>
-            <option value="1-3">2 years</option>
-            <option value="3-5">3 years</option>
-            <option value="0-1">4 years</option>
-            <option value="1-3">5 years+</option>
-          </select> 
-          
-          <select class="filter-select" id="healthFilter">
-            <option value="">-ทั้งหมด-</option>
-            <option value="Vaccinated">Vaccinated</option>
-            <option value="Unvaccinated">Unvaccinated</option>
-          </select>
-          
-          <select class="filter-select" id="colorFilter">
-            <option value="">-ทั้งหมด-</option>
-            <option value="white">สีขาว</option>
-            <option value="black">ดำ</option>
-            <option value="brown">น้ำตาล</option>
-            <option value="gray">เทา</option>
-            <option value="orange">ส้ม</option>
-            <option value="cream">ครีม</option>clea
-            <option value="tricolor">สามสี</option>
-            <option value="solid">ลายสลิด</option>
-            <option value="stripe">ลายด่าง</option>
-            <option value="other">อื่น ๆ</option>
-          </select>
-          
-          <button class="search-btn" onclick="filterPets()">🔍 ค้นหา</button>
-        </div>
+        <h6 class="mb-3">ค้นหาสัตว์</h6>
+        <form class="filter-form" method="GET" action="/home">
+          <div class="filter-row">
+            <input class="filter-input" type="text" name="name" placeholder="ชื่อสัตว์เลี้ยง" value="<%= filters?.name || '' %>">
+            <input class="filter-input" type="text" name="pet_id" placeholder="รหัสสัตว์ ID" value="<%= filters?.pet_id || '' %>">
+
+            <select class="filter-input" name="type">
+              <option value="">-ประเภททั้งหมด-</option>
+              <option value="dogs" <%= filters?.type === 'dogs' ? 'selected' : '' %>>Dogs</option>
+              <option value="cats" <%= filters?.type === 'cats' ? 'selected' : '' %>>Cats</option>
+            </select>
+            
+            <select class="filter-input" name="gender">
+              <option value="">-เพศทั้งหมด-</option>
+              <option value="male" <%= filters?.gender === 'male' ? 'selected' : '' %>>Male</option>
+              <option value="female" <%= filters?.gender === 'female' ? 'selected' : '' %>>Female</option>
+            </select>
+            
+            <select class="filter-input" name="age">
+              <option value="">-อายุทั้งหมด-</option>
+              <option value="0-1" <%= filters?.age === '0-1' ? 'selected' : '' %>>0-1 years</option>
+              <option value="1-3" <%= filters?.age === '1-3' ? 'selected' : '' %>>1-3 years</option>
+              <option value="3-5" <%= filters?.age === '3-5' ? 'selected' : '' %>>3-5 years</option>
+              <option value="5+" <%= filters?.age === '5+' ? 'selected' : '' %>>5 years+</option>
+            </select>
+
+            <select class="filter-input" name="sterilized">
+              <option value="">-ทำหมันทั้งหมด-</option>
+              <option value="yes" <%= filters?.sterilized === 'yes' ? 'selected' : '' %>>ทำแล้ว</option>
+              <option value="no" <%= filters?.sterilized === 'no' ? 'selected' : '' %>>ยังไม่ทำ</option>
+            </select>
+          </div>
+
+          <div class="filter-row">
+            <select class="filter-input" name="adoption_status">
+              <option value="">-สถานะการรับเลี้ยง-</option>
+              <option value="available" <%= filters?.adoption_status === 'available' ? 'selected' : '' %>>พร้อมรับเลี้ยง</option>
+              <option value="adopted" <%= filters?.adoption_status === 'adopted' ? 'selected' : '' %>>ได้รับการรับเลี้ยงแล้ว</option>
+            </select>
+            
+            <select class="filter-input" name="color">
+              <option value="">-สีทั้งหมด-</option>
+              <option value="White" <%= filters?.color === 'White' ? 'selected' : '' %>>White</option>
+              <option value="Black" <%= filters?.color === 'Black' ? 'selected' : '' %>>Black</option>
+              <option value="Brown" <%= filters?.color === 'Brown' ? 'selected' : '' %>>Brown</option>
+              <option value="Gray" <%= filters?.color === 'Gray' ? 'selected' : '' %>>Gray</option>
+              <option value="Orange" <%= filters?.color === 'Orange' ? 'selected' : '' %>>Orange</option>
+              <option value="Calico" <%= filters?.color === 'Calico' ? 'selected' : '' %>>Calico</option>
+              <option value="Tabby" <%= filters?.color === 'Tabby' ? 'selected' : '' %>>Tabby</option>
+            </select>
+
+            <button class="search-btn" type="submit">🔍 ค้นหา</button>
+          </div>
+        </form>
       </div>
 
       <!-- Pet Cards -->
       <div class="pet-cards-container">
         <% pets.forEach(pet => { %>
-        <div class="pet-card" onclick="location.href='/pet/<%= pet.id %>'" style="cursor: pointer; position: relative;">
+        <div class="pet-card" data-petid="<%= pet.id %>" onclick="location.href='/pet/<%= pet.id %>'" style="cursor: pointer;">
           <img src="<%= pet.image %>" alt="<%= pet.name %>" style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px;">
-          <span class="heart-icon" style="position: absolute; top: 10px; right: 10px; font-size: 24px; cursor: pointer;" onclick="event.stopPropagation(); toggleFavorite(this, '<%= pet.id %>', '<%= pet.name %>', '<%= pet.gender %>', '<%= pet.age %>')">🤍</span>
+          <span class="heart-icon" onclick="event.stopPropagation(); toggleFavorite(this, '<%= pet.id %>')">🤍</span>
           <h6><%= pet.name %></h6>
-          <p><%= pet.gender %> <%= pet.gender === '♀' ? 'เพศเมีย' : 'เพศผู้' %> <%= pet.age %> 💉</p>
+          <small class="text-muted">รหัส: <%= pet.petId || '-' %></small>
+          <p>
+            <%= (pet.gender === 'female' || pet.gender === '♀') ? '♀' : '♂' %>
+            <%= (pet.gender === 'female' || pet.gender === '♀') ? 'เพศเมีย' : 'เพศผู้' %>
+            <%= pet.age %> 🎂
+            <% if ((pet.vaccinated || '').toLowerCase() === 'yes') { %> 💉 <% } %>
+          </p>
           <div class="pet-footer">
             <span class="badge-small" onclick="event.stopPropagation(); location.href='/pet/<%= pet.id %>'">รายละเอียด</span>
           </div>
@@ -123,74 +139,28 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-function filterPets() {
-  const type = document.getElementById('typeFilter').value;
-  const gender = document.getElementById('genderFilter').value;
-  const age = document.getElementById('ageFilter').value;
-  
-  const cards = document.querySelectorAll('.pet-card');
-  
-  cards.forEach(card => {
-    let show = true;
-    
-    // ตรวจสอบ type
-    if (type && card.getAttribute('data-type') !== type) {
-      show = false;
-    }
-    
-    // ตรวจสอบ gender
-    if (gender && card.getAttribute('data-gender') !== gender) {
-      show = false;
-    }
-    
-    // ตรวจสอบ age
-    if (age && card.getAttribute('data-age') !== age) {
-      show = false;
-    }
-    
-    if (show) {
-      card.style.display = 'block';
-    } else {
-      card.style.display = 'none';
-    }
-  });
-}
-
-// ให้ dropdown เปลี่ยนแปลงทันที
-document.querySelectorAll('.filter-select').forEach(select => {
-  select.addEventListener('change', filterPets);
-});
-
 // Favorite function
-function toggleFavorite(element, petId, petName, petGender, petAge) {
-  let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-  const petData = { id: petId, name: petName, gender: petGender, age: petAge };
-  
-  const exists = favorites.find(pet => pet.id === petId);
-  
-  if (exists) {
-    // Remove from favorites
-    favorites = favorites.filter(pet => pet.id !== petId);
-    element.textContent = '🤍';
-  } else {
-    // Add to favorites
-    favorites.push(petData);
-    element.textContent = '❤️';
+async function toggleFavorite(element, petId) {
+  const body = new URLSearchParams({ petId });
+  const response = await fetch('/favorites/toggle', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body
+  });
+  const data = await response.json();
+  if (data && data.success) {
+    element.textContent = data.favorited ? '❤️' : '🤍';
   }
-  
-  localStorage.setItem('favorites', JSON.stringify(favorites));
 }
 
 // Load favorites on page load
 window.addEventListener('load', function() {
-  const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+  const favorites = <%- JSON.stringify(favoriteIds || []) %>;
   const cards = document.querySelectorAll('.pet-card');
-  
   cards.forEach(card => {
     const heartIcon = card.querySelector('.heart-icon');
     const petId = card.getAttribute('data-petid');
-    
-    if (favorites.find(pet => pet.id === petId)) {
+    if (favorites.includes(petId)) {
       heartIcon.textContent = '❤️';
     }
   });

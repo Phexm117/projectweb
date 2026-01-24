@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- ===== Page: Favorites ===== -->
 <html lang="th">
 <head>
   <meta charset="UTF-8">
@@ -25,7 +26,7 @@
     <a class="nav-link active" href="/favorites">รายการโปรด</a>
 
     <div class="user-badge ms-3">
-      <span>Kittisak</span>
+      <span><%= (user && user.name) ? user.name : '' %></span>
       <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png">
     </div>
   </div>
@@ -53,11 +54,17 @@
       <!-- Pet Cards -->
       <div class="pet-cards-container">
         <% pets.forEach(pet => { %>
-        <div class="pet-card favorite-item" data-petid="<%= pet.id %>" onclick="location.href='/pet/<%= pet.id %>'" style="cursor: pointer; position: relative; display: none;">
+        <div class="pet-card favorite-item" data-petid="<%= pet.id %>" onclick="location.href='/pet/<%= pet.id %>'" style="cursor: pointer;">
           <img src="<%= pet.image %>" alt="<%= pet.name %>">
-          <span class="heart-icon" style="position: absolute; top: 10px; right: 10px; font-size: 24px; cursor: pointer;" onclick="event.stopPropagation(); toggleFavorite(this, '<%= pet.id %>', '<%= pet.name %>', '<%= pet.gender %>', '<%= pet.age %>')">❤️</span>
+          <span class="heart-icon" onclick="event.stopPropagation(); toggleFavorite(this, '<%= pet.id %>')">❤️</span>
           <h6><%= pet.name %></h6>
-          <p><%= pet.gender %> <%= pet.gender === '♀' ? 'เพศเมีย' : 'เพศผู้' %> <%= pet.age %> 💉</p>
+          <small class="text-muted">รหัส: <%= pet.petId || '-' %></small>
+          <p>
+            <%= (pet.gender === 'female' || pet.gender === '♀') ? '♀' : '♂' %>
+            <%= (pet.gender === 'female' || pet.gender === '♀') ? 'เพศเมีย' : 'เพศผู้' %>
+            <%= pet.age %> 🎂
+            <% if ((pet.vaccinated || '').toLowerCase() === 'yes') { %> 💉 <% } %>
+          </p>
           <div class="pet-footer">
             <span class="badge-small" onclick="event.stopPropagation(); location.href='/pet/<%= pet.id %>'">รายละเอียด</span>
           </div>
@@ -65,7 +72,7 @@
         <% }); %>
       </div>
       
-      <div id="no-favorites" style="text-align: center; padding: 40px; color: #999;">
+      <div id="no-favorites" style="text-align: center; padding: 40px; color: #999; display: <%= pets.length ? 'none' : 'block' %>;">
         <p>ยังไม่มีรายการโปรด 💔</p>
       </div>
     </div>
@@ -81,43 +88,24 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-// Load favorites from localStorage
-function loadFavorites() {
-  const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-  const items = document.querySelectorAll('.favorite-item');
-  const noFavoritesMsg = document.getElementById('no-favorites');
-  let hasFavorites = false;
-  
-  items.forEach(item => {
-    const petId = item.getAttribute('data-petid');
-    const isFavorite = favorites.some(pet => pet.id === petId);
-    if (isFavorite) {
-      item.style.display = 'block';
-      hasFavorites = true;
-    } else {
-      item.style.display = 'none';
-    }
+// Toggle favorite (remove from favorites)
+async function toggleFavorite(element, petId) {
+  const body = new URLSearchParams({ petId });
+  const response = await fetch('/favorites/toggle', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body
   });
-  
-  if (!hasFavorites) {
-    noFavoritesMsg.style.display = 'block';
-  } else {
-    noFavoritesMsg.style.display = 'none';
+  const data = await response.json();
+  if (data && data.success && !data.favorited) {
+    const card = element.closest('.favorite-item');
+    if (card) card.remove();
+    const remaining = document.querySelectorAll('.favorite-item');
+    if (remaining.length === 0) {
+      document.getElementById('no-favorites').style.display = 'block';
+    }
   }
 }
-
-// Toggle favorite (remove from favorites)
-function toggleFavorite(element, petId, petName, petGender, petAge) {
-  let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-  // Remove from favorites
-  favorites = favorites.filter(pet => pet.id !== petId);
-  localStorage.setItem('favorites', JSON.stringify(favorites));
-  // Reload display
-  loadFavorites();
-}
-
-// Load on page load
-window.addEventListener('load', loadFavorites);
 </script>
 
 </body>

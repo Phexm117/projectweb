@@ -1,3 +1,4 @@
+// ===== MySQL connection =====
 require('dotenv').config({ override: true });
 const mysql = require('mysql2');
 
@@ -17,6 +18,7 @@ db.connect((err) => {
   console.log('MySQL connected');
 });
 
+// promise wrapper
 const dbPromise = db.promise();
 
 module.exports = { db, dbPromise };

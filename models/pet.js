@@ -1,3 +1,4 @@
+// ===== Pet model (legacy - MongoDB) =====
 const mongoose = require('mongoose');
 
 const PetSchema = new mongoose.Schema({

@@ -1,6 +1,8 @@
+// ===== Auth routes (legacy) =====
 const express = require('express');
 const router = express.Router();
 
+// Seed users from env (สำหรับเดโม)
 const users = [];
 const adminEmail = process.env.ADMIN_EMAIL;
 const adminPassword = process.env.ADMIN_PASSWORD;
@@ -25,8 +27,10 @@ if (userEmail && userPassword) {
   });
 }
 
+// Login page
 router.get('/login', (req, res) => res.render('login', { error: null }));
 
+// Login submit
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
   if (users.length === 0) {
@@ -42,6 +46,7 @@ router.post('/login', (req, res) => {
   return res.redirect('/user/home');
 });
 
+// Logout
 router.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/login'));
 });
