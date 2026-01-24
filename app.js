@@ -11,7 +11,8 @@ const upload = multer({ dest: 'public/uploads/' });
 
 // Mock pet data
 const pets = [
-  { id: '1', name: 'โคนัน', gender: '♀', age: '2Y', type: 'cats', image: '/uploads/conun.jpg' }
+  { id: '1', name: 'โคนัน', gender: '♀', age: '2Y', type: 'cats', image: '/cat.jpg' },
+  { id: '2', name: 'แมว 2', gender: '♂', age: '1Y', type: 'cats', image: '/conun.jpg' }
 ];
 
 // User view counts for recommendations

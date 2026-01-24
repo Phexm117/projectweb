@@ -53,7 +53,7 @@
       <div class="pet-cards-container">
         <% pets.forEach(pet => { %>
         <div class="pet-card" onclick="location.href='/pet/<%= pet.id %>'" style="cursor: pointer;">
-          <img src="<%= pet.image %>" alt="<%= pet.name %>">
+          <img src="<%= pet.image %>" alt="<%= pet.name %>" style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px;">
           <h6><%= pet.name %></h6>
           <p><span class="badge"><%= pet.type === 'cats' ? 'แมว' : 'สุนัข' %></span> <span class="badge"><%= pet.age %></span></p>
           <div class="pet-info">
