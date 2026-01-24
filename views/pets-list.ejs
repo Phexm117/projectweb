@@ -1,0 +1,7 @@
+<div class="container mt-4">
+  <div class="row">
+    <% pets.forEach(pet => { %>
+      <%- include('partials/pet-card', { pet: pet }) %>
+    <% }) %>
+  </div>
+</div>

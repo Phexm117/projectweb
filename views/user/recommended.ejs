@@ -53,14 +53,12 @@
       <div class="pet-cards-container">
         <% pets.forEach(pet => { %>
         <div class="pet-card" onclick="location.href='/pet/<%= pet.id %>'" style="cursor: pointer;">
-          <img src="<%= pet.image %>" alt="<%= pet.name %>" style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px;">
+          <img src="<%= pet.image %>" alt="<%= pet.name %>">
           <h6><%= pet.name %></h6>
-          <p><span class="badge"><%= pet.type === 'cats' ? 'แมว' : 'สุนัข' %></span> <span class="badge"><%= pet.age %></span></p>
-          <div class="pet-info">
-            <span><%= pet.gender %> <%= pet.gender === '♀' ? 'เพศเมีย' : 'เพศผู้' %></span>
-            <span>💚</span>
+          <p><%= pet.gender %> <%= pet.gender === '♀' ? 'เพศเมีย' : 'เพศผู้' %> <%= pet.age %> 💉</p>
+          <div class="pet-footer">
+            <span class="badge-small" onclick="event.stopPropagation(); location.href='/pet/<%= pet.id %>'">รายละเอียด</span>
           </div>
-          <button class="adopt-btn">รับเลี้ยง</button>
         </div>
         <% }); %>
       </div>
@@ -75,6 +73,43 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Favorite function
+function toggleFavorite(element, petId, petName, petGender, petAge) {
+  let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+  const petData = { id: petId, name: petName, gender: petGender, age: petAge };
+  
+  const exists = favorites.find(pet => pet.id === petId);
+  
+  if (exists) {
+    // Remove from favorites
+    favorites = favorites.filter(pet => pet.id !== petId);
+    element.textContent = '🤍';
+  } else {
+    // Add to favorites
+    favorites.push(petData);
+    element.textContent = '❤️';
+  }
+  
+  localStorage.setItem('favorites', JSON.stringify(favorites));
+}
+
+// Load favorites on page load
+window.addEventListener('load', function() {
+  const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+  const cards = document.querySelectorAll('.pet-card');
+  
+  cards.forEach(card => {
+    const heartIcon = card.querySelector('.heart-icon');
+    const petId = card.getAttribute('data-petid');
+    
+    if (favorites.find(pet => pet.id === petId)) {
+      heartIcon.textContent = '❤️';
+    }
+  });
+});
+</script>
 
 </body>
 </html>

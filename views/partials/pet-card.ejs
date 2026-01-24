@@ -1,0 +1,13 @@
+<div class="col-md-4 mb-3">
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title"><%= pet.name %> <small class="text-muted">(<%= pet.petId %>)</small></h5>
+      <p class="mb-1">ประเภท: <%= pet.type %></p>
+      <p class="mb-1">เพศ: <%= pet.gender === 'male' ? 'ผู้' : 'เมีย' %></p>
+      <p class="mb-1">อายุ: <%= pet.ageYear %> ปี <%= pet.ageMonth %> เดือน</p>
+      <p class="mb-1">ทำหมัน: <%= pet.sterilized === 'yes' ? 'ทำแล้ว' : 'ยังไม่ทำ' %></p>
+      <p class="mb-1">สี: <span class="badge" style="background:<%= pet.color || '#ccc' %>;">&nbsp;&nbsp;&nbsp;</span> <%= pet.color %></p>
+      <p class="mt-2"><%= pet.details %></p>
+    </div>
+  </div>
+</div>
