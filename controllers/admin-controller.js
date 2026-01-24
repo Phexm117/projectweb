@@ -9,6 +9,7 @@ const {
   togglePostStatus
 } = require('../services/pets-service');
 const { fetchLoginActivity, changePassword } = require('../services/admin-service');
+const { notifyFavoritesAdopted, notifyNewPetMatches } = require('../services/notifications-service');
 
 function createAdminController({ dbPromise }) {
   async function renderAdminPage(req, res, options = {}) {
@@ -81,7 +82,10 @@ function createAdminController({ dbPromise }) {
     },
     async postAddPet(req, res) {
       try {
-        await addPet(dbPromise, { body: req.body, files: req.files });
+        const pet = await addPet(dbPromise, { body: req.body, files: req.files });
+        if (pet?.id) {
+          await notifyNewPetMatches(dbPromise, pet);
+        }
       } catch (err) {
         console.error('Add pet error:', err.message);
       }
@@ -94,8 +98,11 @@ function createAdminController({ dbPromise }) {
     },
     async postEditPet(req, res) {
       try {
-        const updatedId = await updatePet(dbPromise, { body: req.body, files: req.files });
-        if (!updatedId) return res.redirect('/admin');
+        const result = await updatePet(dbPromise, { body: req.body, files: req.files });
+        if (!result?.id) return res.redirect('/admin');
+        if (result.previousAdoptionStatus !== 'adopted' && result.nextAdoptionStatus === 'adopted') {
+          await notifyFavoritesAdopted(dbPromise, result.id, result.name || 'สัตว์เลี้ยง');
+        }
       } catch (err) {
         console.error('Update pet error:', err.message);
       }

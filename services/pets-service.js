@@ -65,7 +65,7 @@ async function fetchPetsForUser(dbPromise, filters = {}) {
     params.push(filters.color);
   }
 
-  const sql = `SELECT id, pet_id, name, gender, age_year, age_month, age_text, type, image, vaccinated
+  const sql = `SELECT id, pet_id, name, gender, age_year, age_month, age_text, type, image, vaccinated, sterilized, view_count
                FROM pets
                WHERE ${where.join(' AND ')}
                ORDER BY id`;
@@ -76,9 +76,13 @@ async function fetchPetsForUser(dbPromise, filters = {}) {
     name: row.name,
     gender: row.gender,
     age: formatAge(row),
+    ageYear: row.age_year,
+    ageMonth: row.age_month,
     type: row.type,
     image: row.image || '/cat.jpg',
-    vaccinated: (row.vaccinated || 'no')
+    vaccinated: (row.vaccinated || 'no'),
+    sterilized: row.sterilized || 'no',
+    viewCount: row.view_count || 0
   }));
 }
 
@@ -169,7 +173,7 @@ async function fetchPetById(dbPromise, petId) {
   const numericId = Number.parseInt(rawId, 10);
   if (!Number.isFinite(numericId)) return null;
   const [rows] = await dbPromise.query(
-    'SELECT `id`, `pet_id`, `name`, `gender`, `age_year`, `age_month`, `age_text`, `type`, `image`, `image_2`, `image_3`, `sterilized`, `post_status`, `adoption_status`, `vaccinated`, `color`, `details` FROM `pets` WHERE `id` = ? LIMIT 1',
+    'SELECT `id`, `pet_id`, `name`, `gender`, `age_year`, `age_month`, `age_text`, `type`, `image`, `image_2`, `image_3`, `sterilized`, `post_status`, `adoption_status`, `vaccinated`, `color`, `details`, `view_count` FROM `pets` WHERE `id` = ? LIMIT 1',
     [numericId]
   );
   const row = rows && rows[0];
@@ -192,8 +196,20 @@ async function fetchPetById(dbPromise, petId) {
     adoptionStatus: row.adoption_status,
     vaccinated: row.vaccinated,
     color: row.color,
-    details: row.details
+    details: row.details,
+    viewCount: row.view_count || 0
   };
+}
+
+async function incrementPetView(dbPromise, petId) {
+  const rawId = Array.isArray(petId) ? petId[0] : petId;
+  const numericId = Number.parseInt(rawId, 10);
+  if (!Number.isFinite(numericId)) return null;
+  await dbPromise.query(
+    'UPDATE pets SET view_count = view_count + 1 WHERE id = ? LIMIT 1',
+    [numericId]
+  );
+  return numericId;
 }
 
 async function addPet(dbPromise, payload) {
@@ -242,6 +258,16 @@ async function addPet(dbPromise, payload) {
       [generatedPetId, insertResult.insertId]
     );
   }
+
+  return {
+    id: insertResult?.insertId || null,
+    name: body.name,
+    type: body.type,
+    ageYear,
+    ageMonth,
+    sterilized,
+    vaccinated
+  };
 }
 
 async function updatePet(dbPromise, payload) {
@@ -301,7 +327,13 @@ async function updatePet(dbPromise, payload) {
       numericId
     ]
   );
-  return numericId;
+  return {
+    id: numericId,
+    petId: body.pet_id || existing?.petId || null,
+    name: body.name,
+    previousAdoptionStatus: existing?.adoptionStatus || null,
+    nextAdoptionStatus: adoptionStatus
+  };
 }
 
 async function deletePetAndArchive(dbPromise, petId) {
@@ -352,6 +384,7 @@ module.exports = {
   fetchPetsForUser,
   fetchPetsForAdmin,
   fetchPetById,
+  incrementPetView,
   addPet,
   updatePet,
   deletePetAndArchive,

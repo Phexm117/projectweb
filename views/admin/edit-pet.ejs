@@ -12,7 +12,7 @@
   <!-- CSS -->
   <link rel="stylesheet" href="/style.css">
 </head>
-<body>
+<body class="minimal-theme">
 
 <nav class="navbar">
   <div class="d-flex align-items-center gap-2">
@@ -49,8 +49,15 @@
 
     <!-- Content -->
     <div class="col-9">
-      <h5 class="mb-4">แก้ไขข้อมูลสัตว์เลี้ยง</h5>
-      <form action="/admin/edit-pet" method="POST" enctype="multipart/form-data">
+      <div class="admin-form-card">
+        <div class="admin-form-header">
+          <div>
+            <h5>แก้ไขข้อมูลสัตว์เลี้ยง</h5>
+            <p>อัปเดตข้อมูลสัตว์เลี้ยงให้ครบถ้วนและตรงกับความเป็นจริง</p>
+          </div>
+          <span class="admin-form-badge">Edit</span>
+        </div>
+        <form action="/admin/edit-pet" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="id" value="<%= pet.id %>">
         <div class="row g-3">
           <div class="col-md-6">
@@ -153,14 +160,15 @@
           </div>
 
           <div class="col-12 d-flex gap-2">
-            <button type="submit" class="btn btn-primary">แก้ไข</button>
+            <button type="submit" class="btn btn-primary">บันทึกการแก้ไข</button>
             <form action="/admin/delete-pet" method="POST" onsubmit="return confirm('ลบข้อมูลสัตว์เลี้ยงนี้ใช่หรือไม่?');">
               <input type="hidden" name="id" value="<%= pet.id %>">
-              <button type="submit" class="btn btn-danger">ลบ</button>
+              <button type="submit" class="btn btn-danger">ลบข้อมูล</button>
             </form>
           </div>
         </div>
-      </form>
+        </form>
+      </div>
     </div>
   </div>
 </div>

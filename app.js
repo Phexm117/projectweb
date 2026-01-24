@@ -3,7 +3,7 @@ require('dotenv').config({ override: true });
 const express = require("express");
 const multer = require('multer');
 const { dbPromise } = require('./db/mysql');
-const { PORT, UPLOAD_DIR } = require('./config/app');
+const { PORT, UPLOAD_DIR, HOST } = require('./config/app');
 const { initMySql } = require('./config/mysql-init');
 const { createAuthMiddleware } = require('./middleware/auth');
 const { createPublicController } = require('./controllers/public-controller');
@@ -26,6 +26,7 @@ const petUploadFields = upload.fields([
 
 // ===== In-memory stores =====
 const viewCounts = {}; // { userId: { petId: count } }
+const searchProfiles = {}; // { userId: { lastSearch: {...} } }
 
 // Simple cookie parser middleware (ไม่ใช้ cookie-parser)
 app.use((req, res, next) => {
@@ -965,7 +966,7 @@ const { requireAdmin, requireUser } = authMiddleware;
 
 const publicController = createPublicController();
 const authController = createAuthController({ dbPromise, sessions });
-const userController = createUserController({ dbPromise, viewCounts });
+const userController = createUserController({ dbPromise, viewCounts, searchProfiles });
 const adminController = createAdminController({ dbPromise });
 
 // ===== Public routes =====
@@ -976,6 +977,10 @@ app.get('/home', requireUser, userController.home);
 app.get('/recommended', requireUser, userController.recommended);
 app.get('/favorites', requireUser, userController.favorites);
 app.get('/pet/:id', requireUser, userController.petDetail);
+
+app.get('/notifications', requireUser, userController.notificationsPage);
+app.get('/notifications/stream', requireUser, userController.notificationsStream);
+app.get('/notifications/latest', requireUser, userController.notificationsLatest);
 
 app.post('/favorites/toggle', requireUser, userController.toggleFavorite);
 
@@ -1003,6 +1008,7 @@ app.post('/admin/edit-pet', requireAdmin, petUploadFields, adminController.postE
 app.post('/admin/delete-pet', requireAdmin, adminController.deletePet);
 
 // ===== Start server =====
-app.listen(PORT, () => {
-  console.log(`Server running http://localhost:${PORT}`);
+app.listen(PORT, HOST, () => {
+  const displayHost = HOST === '0.0.0.0' ? 'localhost' : HOST;
+  console.log(`Server running http://${displayHost}:${PORT}`);
 });

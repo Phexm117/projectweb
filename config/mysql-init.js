@@ -46,6 +46,20 @@ async function initMySql(dbPromise) {
       )
     `);
 
+    await dbPromise.query(`
+      CREATE TABLE IF NOT EXISTS notifications (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        pet_id INT NULL,
+        type VARCHAR(50) NOT NULL,
+        message VARCHAR(255) NOT NULL,
+        is_read TINYINT(1) NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_notifications_user_id (user_id),
+        INDEX idx_notifications_pet_id (pet_id)
+      )
+    `);
+
     async function ensureColumn(columnName, columnDefinition) {
       const [columns] = await dbPromise.query(
         `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
@@ -133,6 +147,7 @@ async function initMySql(dbPromise) {
     await ensurePetColumn('image_3', "image_3 VARCHAR(255) NULL");
     await ensurePetColumn('adoption_status', "adoption_status ENUM('available', 'unavailable', 'adopted') NOT NULL DEFAULT 'available'");
     await ensurePetColumn('vaccinated', "vaccinated ENUM('yes', 'no') NOT NULL DEFAULT 'no'");
+    await ensurePetColumn('view_count', "view_count INT NOT NULL DEFAULT 0");
     await ensurePetColumn('created_at', "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
 
     const adminEmail = process.env.ADMIN_EMAIL;

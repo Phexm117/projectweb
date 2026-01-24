@@ -12,7 +12,7 @@
   <!-- CSS -->
   <link rel="stylesheet" href="/style.css">
 </head>
-<body>
+<body class="minimal-theme">
 
 <nav class="navbar">
   <div class="d-flex align-items-center gap-2">
@@ -31,6 +31,16 @@
     </div>
   </div>
 </nav>
+
+<div class="notification-float">
+  <a href="/notifications" class="notification-bell" id="bellButton" aria-label="Notifications">
+    🔔
+    <span class="notification-count" id="notificationCount">0</span>
+  </a>
+  <div class="notification-panel" id="notificationPanel">
+    <div class="notification-empty">ยังไม่มีการแจ้งเตือน</div>
+  </div>
+</div>
 
 <section class="hero" style="background-image: url('/banner.jpg'); background-size: cover; background-position: center;">
   <div class="hero-overlay"></div>
@@ -52,18 +62,35 @@
       <h5 class="mb-4">รายการโปรด</h5>
 
       <!-- Pet Cards -->
+      <% const formatViews = (value) => {
+        const count = Number(value) || 0;
+        if (count >= 1000) {
+          const short = (count / 1000).toFixed(1).replace(/\.0$/, '');
+          return `${short}K`;
+        }
+        return `${count}`;
+      }; %>
       <div class="pet-cards-container">
         <% pets.forEach(pet => { %>
         <div class="pet-card favorite-item" data-petid="<%= pet.id %>" onclick="location.href='/pet/<%= pet.id %>'" style="cursor: pointer;">
-          <img src="<%= pet.image %>" alt="<%= pet.name %>">
-          <span class="heart-icon" onclick="event.stopPropagation(); toggleFavorite(this, '<%= pet.id %>')">❤️</span>
+          <div class="pet-image-wrap">
+            <img src="<%= pet.image %>" alt="<%= pet.name %>">
+            <span class="pet-view-badge">
+              <span class="view-icon">👁</span>
+              <span><%= formatViews(pet.viewCount) %></span>
+            </span>
+            <span class="heart-icon" onclick="event.stopPropagation(); toggleFavorite(this, '<%= pet.id %>')">❤️</span>
+          </div>
           <h6><%= pet.name %></h6>
           <small class="text-muted">รหัส: <%= pet.petId || '-' %></small>
           <p>
-            <%= (pet.gender === 'female' || pet.gender === '♀') ? '♀' : '♂' %>
-            <%= (pet.gender === 'female' || pet.gender === '♀') ? 'เพศเมีย' : 'เพศผู้' %>
-            <%= pet.age %> 🎂
-            <% if ((pet.vaccinated || '').toLowerCase() === 'yes') { %> 💉 <% } %>
+            <%= (pet.gender === 'female' || pet.gender === '♀') ? '♀ เพศเมีย' : '♂ เพศผู้' %>
+            🎂 <%= pet.age %>
+            <% if ((pet.vaccinated || '').toLowerCase() === 'yes') { %>
+              💉 ฉีดแล้ว
+            <% } else { %>
+              ยังไม่ฉีด
+            <% } %>
           </p>
           <div class="pet-footer">
             <span class="badge-small" onclick="event.stopPropagation(); location.href='/pet/<%= pet.id %>'">รายละเอียด</span>
@@ -72,7 +99,7 @@
         <% }); %>
       </div>
       
-      <div id="no-favorites" style="text-align: center; padding: 40px; color: #999; display: <%= pets.length ? 'none' : 'block' %>;">
+      <div id="no-favorites" class="no-favorites <%= pets.length ? 'd-none' : '' %>">
         <p>ยังไม่มีรายการโปรด 💔</p>
       </div>
     </div>
@@ -106,6 +133,70 @@ async function toggleFavorite(element, petId) {
     }
   }
 }
+</script>
+
+<script>
+function formatNotificationType(type) {
+  if (type === 'favorite_adopted') return 'สัตว์ในรายการโปรดถูกรับเลี้ยง';
+  if (type === 'new_pet_match') return 'มีสัตว์ใหม่ตรงกับความสนใจ';
+  return 'การแจ้งเตือน';
+}
+
+async function loadNotifications(panelEl) {
+  try {
+    const response = await fetch('/notifications/latest');
+    const data = await response.json();
+    if (!data || !data.success) return;
+
+    const items = data.notifications || [];
+    if (items.length === 0) {
+      panelEl.innerHTML = '<div class="notification-empty">ยังไม่มีการแจ้งเตือน</div>';
+      return;
+    }
+    panelEl.innerHTML = items.map(item => `
+      <a class="notification-item ${item.isRead ? '' : 'notification-unread'}" href="/pet/${item.petId}?notificationId=${item.id}">
+        <div>${item.message}</div>
+        <small class="text-muted">${formatNotificationType(item.type)} • ${new Date(item.createdAt).toLocaleString('th-TH')}</small>
+      </a>
+    `).join('');
+  } catch (err) {
+    // ignore
+  }
+}
+
+(function initNotifications() {
+  const countEl = document.getElementById('notificationCount');
+  const panelEl = document.getElementById('notificationPanel');
+  const bellButton = document.getElementById('bellButton');
+  if (!countEl) return;
+
+  if (bellButton && panelEl) {
+    bellButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      panelEl.classList.toggle('show');
+      if (panelEl.classList.contains('show')) {
+        loadNotifications(panelEl);
+      }
+    });
+    document.addEventListener('click', (event) => {
+      if (!panelEl.contains(event.target) && !bellButton.contains(event.target)) {
+        panelEl.classList.remove('show');
+      }
+    });
+  }
+
+  const source = new EventSource('/notifications/stream');
+  source.addEventListener('message', (event) => {
+    try {
+      const data = JSON.parse(event.data || '{}');
+      const count = Number(data.unreadCount || 0);
+      countEl.textContent = count > 99 ? '99+' : String(count);
+      countEl.style.display = count > 0 ? 'inline-flex' : 'none';
+    } catch (err) {
+      // ignore
+    }
+  });
+})();
 </script>
 
 </body>

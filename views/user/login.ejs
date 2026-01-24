@@ -23,9 +23,9 @@
     </div>
 
     <!-- Title -->
-    <h3 class="auth-title">“ ร่วมเป็นส่วนหนึ่ง<br>ในการมอบโอกาสใหม่ให้ชีวิตเล็ก ๆ เหล่านี้ ”</h3>
+    <h3 class="auth-title">เข้าสู่ระบบ</h3>
 
-    <!-- Error Message -->
+   <!-- Error Message  -->
     <% if (typeof error !== 'undefined' && error) { %>
       <div class="alert alert-danger alert-dismissible fade show" role="alert">
         <%= error %>
@@ -39,8 +39,9 @@
         <input type="email" name="email" class="auth-input" placeholder="📧 Email" required>
       </div>
 
-      <div class="form-group">
-        <input type="password" name="password" class="auth-input" placeholder="🔒 Password" required>
+      <div class="form-group password-field">
+        <input type="password" id="passwordInput" name="password" class="auth-input" placeholder="🔒 Password" required>
+        <button type="button" class="toggle-password" aria-label="แสดงรหัสผ่าน" aria-pressed="false">แสดง</button>
       </div>
 
       <a href="/forgot-password" class="forgot-password">ลืมรหัสผ่าน?</a>
@@ -57,6 +58,20 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const togglePasswordBtn = document.querySelector('.toggle-password');
+  const passwordInput = document.getElementById('passwordInput');
+
+  if (togglePasswordBtn && passwordInput) {
+    togglePasswordBtn.addEventListener('click', () => {
+      const isPassword = passwordInput.type === 'password';
+      passwordInput.type = isPassword ? 'text' : 'password';
+      togglePasswordBtn.textContent = isPassword ? 'ซ่อน' : 'แสดง';
+      togglePasswordBtn.setAttribute('aria-label', isPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน');
+      togglePasswordBtn.setAttribute('aria-pressed', String(isPassword));
+    });
+  }
+</script>
 
 </body>
 </html>
