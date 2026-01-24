@@ -108,9 +108,13 @@ function loadFavorites() {
   }
 }
 
-// Load on page load
-window.addEventListener('load', loadFavorites);
-</script>
+// Toggle favorite (remove from favorites)
+function toggleFavorite(element, petId, petName, petGender, petAge) {
+  let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+  // Remove from favorites
+  favorites = favorites.filter(pet => pet.id !== petId);
+  localStorage.setItem('favorites', JSON.stringify(favorites));
+  // Reload display
   loadFavorites();
 }
 
