@@ -2,20 +2,21 @@
 require('dotenv').config({ override: true });
 const mysql = require('mysql2');
 
-const db = mysql.createConnection({
+const db = mysql.createPool({
   host: process.env.MYSQL_HOST || '127.0.0.1',
   port: process.env.MYSQL_PORT ? Number(process.env.MYSQL_PORT) : 3306,
   user: process.env.MYSQL_USER || 'root',
   password: process.env.MYSQL_PASSWORD || '',
-  database: process.env.MYSQL_DATABASE || 'projectweb'
+  database: process.env.MYSQL_DATABASE || 'projectweb',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 10000
 });
 
-db.connect((err) => {
-  if (err) {
-    console.error('MySQL connection error:', err.message);
-    return;
-  }
-  console.log('MySQL connected');
+db.on('error', (err) => {
+  console.error('MySQL pool error:', err.message);
 });
 
 // promise wrapper

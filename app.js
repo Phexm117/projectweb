@@ -966,7 +966,7 @@ const { requireAdmin, requireUser } = authMiddleware;
 
 const publicController = createPublicController();
 const authController = createAuthController({ dbPromise, sessions });
-const userController = createUserController({ dbPromise, viewCounts, searchProfiles });
+const userController = createUserController({ dbPromise, viewCounts, searchProfiles, sessions });
 const adminController = createAdminController({ dbPromise });
 
 // ===== Public routes =====
@@ -981,6 +981,11 @@ app.get('/pet/:id', requireUser, userController.petDetail);
 app.get('/notifications', requireUser, userController.notificationsPage);
 app.get('/notifications/stream', requireUser, userController.notificationsStream);
 app.get('/notifications/latest', requireUser, userController.notificationsLatest);
+
+app.get('/profile/edit', requireUser, userController.editProfilePage);
+app.post('/profile/edit', requireUser, userController.updateProfile);
+app.get('/profile/password', requireUser, userController.changePasswordPage);
+app.post('/profile/password', requireUser, userController.changePassword);
 
 app.post('/favorites/toggle', requireUser, userController.toggleFavorite);
 

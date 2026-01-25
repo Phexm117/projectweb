@@ -26,9 +26,17 @@
     <a class="nav-link" href="/recommended">รายการแนะนำ</a>
     <a class="nav-link" href="/favorites">รายการโปรด</a>
 
-    <div class="user-badge ms-3">
-      <span><%= (user && user.name) ? user.name : '' %></span>
-      <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png">
+    <div class="dropdown user-menu ms-3">
+      <button class="user-badge user-menu-toggle dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <span><%= (user && user.name) ? user.name : '' %></span>
+        <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png">
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li><a class="dropdown-item" href="/profile/edit">แก้ไขข้อมูล</a></li>
+        <li><a class="dropdown-item" href="/profile/password">เปลี่ยนรหัสผ่าน</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item text-danger" href="/logout">ออกจากระบบ</a></li>
+      </ul>
     </div>
   </div>
 </nav>
@@ -62,9 +70,10 @@
       <div class="filter-section mb-4">
         <h6 class="mb-3">ค้นหาสัตว์</h6>
         <form class="filter-form" method="GET" action="/home">
-          <div class="filter-row">
+          <div class="filter-row user-search-row-center">
             <input class="filter-input" type="text" name="name" placeholder="ชื่อสัตว์เลี้ยง" value="<%= filters?.name || '' %>">
             <input class="filter-input" type="text" name="pet_id" placeholder="รหัสสัตว์ ID" value="<%= filters?.pet_id || '' %>">
+            <button class="search-btn search-btn-right" type="submit">🔍 ค้นหา</button>
           </div>
 
           <div class="filter-row">
@@ -110,8 +119,6 @@
               <option value="Calico" <%= filters?.color === 'Calico' ? 'selected' : '' %>>Calico</option>
               <option value="Tabby" <%= filters?.color === 'Tabby' ? 'selected' : '' %>>Tabby</option>
             </select>
-
-            <button class="search-btn search-btn-right" type="submit">🔍 ค้นหา</button>
           </div>
         </form>
       </div>

@@ -2,10 +2,26 @@
 
 const { fetchPetsForUser, fetchPetById, incrementPetView } = require('../services/pets-service');
 const { fetchFavoriteIds, fetchFavoritePets, toggleFavorite } = require('../services/user-service');
-const { findUserByEmail, createUser, updatePasswordByEmail } = require('../services/auth-service');
+const {
+  findUserByEmail,
+  findUserById,
+  createUser,
+  updatePasswordByEmail,
+  updatePasswordById,
+  updateUserProfile
+} = require('../services/auth-service');
 const { fetchNotifications, getUnreadCount, markRead } = require('../services/notifications-service');
 
-function createUserController({ dbPromise, viewCounts, searchProfiles }) {
+function createUserController({ dbPromise, viewCounts, searchProfiles, sessions }) {
+  function sanitizeProfile(row) {
+    if (!row) return null;
+    return {
+      id: row.id,
+      name: row.name,
+      email: row.email,
+      role: row.role
+    };
+  }
   function normalizeSearch(query = {}) {
     const normalized = {
       type: query.type || null,
@@ -185,6 +201,66 @@ function createUserController({ dbPromise, viewCounts, searchProfiles }) {
         return res.json({ success: true, notifications });
       } catch (err) {
         return res.status(500).json({ success: false });
+      }
+    },
+    async editProfilePage(req, res) {
+      const profile = sanitizeProfile(await findUserById(dbPromise, req.user.id));
+      return res.render('user/edit-profile', { user: req.user, profile });
+    },
+    async updateProfile(req, res) {
+      try {
+        const { name, email } = req.body;
+        if (!name || !email) {
+          const profile = sanitizeProfile(await findUserById(dbPromise, req.user.id));
+          return res.render('user/edit-profile', { user: req.user, profile, error: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
+        }
+
+        const existing = await findUserByEmail(dbPromise, email);
+        if (existing && existing.id !== req.user.id) {
+          const profile = sanitizeProfile(await findUserById(dbPromise, req.user.id));
+          return res.render('user/edit-profile', { user: req.user, profile, error: 'อีเมลนี้ถูกใช้งานแล้ว' });
+        }
+
+        await updateUserProfile(dbPromise, req.user.id, { name, email });
+        await dbPromise.query('UPDATE user_sessions SET name = ? WHERE user_id = ?', [name, req.user.id]);
+
+        const sessionId = req.cookies?.sessionId;
+        if (sessionId && sessions[sessionId]?.user) {
+          sessions[sessionId].user.name = name;
+        }
+
+        const profile = sanitizeProfile(await findUserById(dbPromise, req.user.id));
+        return res.render('user/edit-profile', { user: { ...req.user, name }, profile, success: 'บันทึกข้อมูลเรียบร้อยแล้ว' });
+      } catch (err) {
+        console.error('Update profile error:', err.message);
+        const profile = sanitizeProfile(await findUserById(dbPromise, req.user.id));
+        return res.render('user/edit-profile', { user: req.user, profile, error: 'ระบบมีปัญหา โปรดลองอีกครั้ง' });
+      }
+    },
+    changePasswordPage(req, res) {
+      const success = req.query?.success ? 'เปลี่ยนรหัสผ่านเรียบร้อยแล้ว' : undefined;
+      res.render('user/change-password', { user: req.user, success });
+    },
+    async changePassword(req, res) {
+      try {
+        const { currentPassword, newPassword, confirmPassword } = req.body;
+        if (!currentPassword || !newPassword || !confirmPassword) {
+          return res.render('user/change-password', { user: req.user, error: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
+        }
+        if (newPassword !== confirmPassword) {
+          return res.render('user/change-password', { user: req.user, error: 'รหัสผ่านไม่ตรงกัน' });
+        }
+
+        const existing = await findUserById(dbPromise, req.user.id);
+        if (!existing || existing.password !== currentPassword) {
+          return res.render('user/change-password', { user: req.user, error: 'รหัสผ่านปัจจุบันไม่ถูกต้อง' });
+        }
+
+        await updatePasswordById(dbPromise, req.user.id, newPassword);
+        return res.redirect('/profile/password?success=1');
+      } catch (err) {
+        console.error('Change password error:', err.message);
+        return res.render('user/change-password', { user: req.user, error: 'ระบบมีปัญหา โปรดลองอีกครั้ง' });
       }
     },
     signupPage(req, res) {
