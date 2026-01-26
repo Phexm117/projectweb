@@ -520,12 +520,13 @@ body {
 /* Pet Detail Page */
 .pet-detail-card {
   background: #ffffff;
-  border-radius: 24px;
+  border-radius: 16px;
   box-shadow: 0 12px 30px rgba(0,0,0,0.08);
   padding: 24px;
   display: grid;
   grid-template-columns: 1.1fr 0.7fr;
   gap: 24px;
+  align-items: start;
 }
 
 .modern-detail {
@@ -545,23 +546,24 @@ body {
 }
 
 .pet-carousel {
-  border-radius: 20px;
+  border-radius: 12px;
   overflow: hidden;
 }
 
 .modern-carousel {
-  border-radius: 26px;
+  border-radius: 14px;
   box-shadow: 0 18px 40px rgba(0,0,0,0.18);
 }
 
 .minimal-carousel {
-  border-radius: 18px;
+  border-radius: 10px;
   box-shadow: none;
   border: 1px solid #eef1f0;
 }
 
 .pet-img {
-  height: 470px;
+  height: 420px;
+  width: 100%;
   object-fit: cover;
 }
 
