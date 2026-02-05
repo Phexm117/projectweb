@@ -700,7 +700,12 @@ app.post("/login", async (req, res) => {
     }
     const sessionId = Math.random().toString(36).substring(7);
     sessions[sessionId] = { user: { id: user.id, name: user.name, role: user.role } };
-    res.cookie("sessionId", sessionId, { httpOnly: true });
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    };
+    res.cookie("sessionId", sessionId, cookieOptions);
     await dbPromise.query(
       `INSERT INTO user_sessions (session_id, user_id, name, role)
        VALUES (?, ?, ?, ?)

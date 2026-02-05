@@ -3,6 +3,13 @@
 const { findUserByEmail, verifyPassword } = require('../services/auth-service');
 
 function createAuthController({ dbPromise, sessions }) {
+  function getSessionCookieOptions() {
+    return {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    };
+  }
   return {
     loginPage(req, res) {
       res.render('user/login');
@@ -18,7 +25,8 @@ function createAuthController({ dbPromise, sessions }) {
         }
         const sessionId = Math.random().toString(36).substring(7);
         sessions[sessionId] = { user: { id: user.id, name: user.name, role: user.role } };
-        res.cookie('sessionId', sessionId, { httpOnly: true });
+        const cookieOptions = getSessionCookieOptions();
+        res.cookie('sessionId', sessionId, cookieOptions);
         await dbPromise.query(
           `INSERT INTO user_sessions (session_id, user_id, name, role)
            VALUES (?, ?, ?, ?)
@@ -43,7 +51,7 @@ function createAuthController({ dbPromise, sessions }) {
           .query('DELETE FROM user_sessions WHERE session_id = ?', [req.cookies.sessionId])
           .catch(err => console.error('Session delete error:', err.message));
       }
-      res.clearCookie('sessionId');
+      res.clearCookie('sessionId', getSessionCookieOptions());
       res.redirect('/login');
     }
   };
