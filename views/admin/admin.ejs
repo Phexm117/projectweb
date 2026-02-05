@@ -20,9 +20,9 @@
   </div>
 
   <div class="d-flex align-items-center">
-    <a class="nav-link <%= activeTab === 'pets' ? 'active' : '' %>" href="/admin?tab=pets">จัดการข้อมูลสัตว์เลี้ยง</a>
-    <a class="nav-link <%= activeTab === 'search' ? 'active' : '' %>" href="/admin?tab=search">ค้นหาสัตว์</a>
-    <a class="nav-link <%= activeTab === 'settings' ? 'active' : '' %>" href="/admin?tab=settings">ตั้งค่า</a>
+    <a class="nav-link admin-top-link <%= activeTab === 'pets' ? 'active' : '' %>" href="/admin?tab=pets" data-tab="pets">จัดการข้อมูลสัตว์เลี้ยง</a>
+    <a class="nav-link admin-top-link <%= activeTab === 'search' ? 'active' : '' %>" href="/admin?tab=search" data-tab="search">ค้นหาสัตว์</a>
+    <a class="nav-link admin-top-link <%= activeTab === 'settings' ? 'active' : '' %>" href="/admin?tab=settings" data-tab="settings">ตั้งค่า</a>
 
     <div class="user-badge ms-3">
       <span><%= user.name %></span>
@@ -290,6 +290,12 @@ function showTab(tabName) {
     btn.classList.remove('active');
   });
 
+  // Sync top nav state
+  var topLinks = document.querySelectorAll('.admin-top-link');
+  topLinks.forEach(function(link) {
+    link.classList.toggle('active', link.dataset.tab === tabName);
+  });
+
   // Show selected tab and mark button as active
   if (tabName === 'pets') {
     document.getElementById('petsTab').style.display = 'block';
@@ -300,6 +306,15 @@ function showTab(tabName) {
   } else if (tabName === 'settings') {
     document.getElementById('settingsTab').style.display = 'block';
     buttons[2].classList.add('active');
+  }
+
+  // Update URL without full reload
+  try {
+    var nextUrl = new URL(window.location.href);
+    nextUrl.searchParams.set('tab', tabName);
+    window.history.replaceState({}, '', nextUrl.toString());
+  } catch (err) {
+    // ignore URL update errors
   }
 }
 </script>

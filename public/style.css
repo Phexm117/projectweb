@@ -1723,10 +1723,10 @@ img, video, canvas, svg {
 
 .btn-edit {
   background: #7fd1c2;
-  color: white;
+  color: #ffffff;
   border: none;
-  padding: 8px 16px;
-  border-radius: 20px;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
   cursor: pointer;
   font-size: 13px;
 }
