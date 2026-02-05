@@ -1,0 +1,100 @@
+<!-- ===== Partial: Pet modal ===== -->
+<div class="modal fade pet-modal" id="petModal-<%= pet.id %>" data-petid="<%= pet.id %>" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 18px; overflow: hidden;">
+      <div class="modal-header" style="border-bottom: none;">
+        <h5 class="modal-title" style="font-weight: 700; color: #2f6f62;">รายละเอียดสัตว์เลี้ยง</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="padding: 20px 24px 28px;">
+        <div class="row g-4">
+          <div class="col-md-7">
+            <div style="background: #f2f4f5; border-radius: 16px; overflow: hidden; position: relative;">
+              <button type="button" onclick="toggleFavorite(this, '<%= pet.id %>')" style="position: absolute; top: 12px; right: 12px; z-index: 2; border: none; background: #ffffff; color: #2f6f62; width: 38px; height: 38px; border-radius: 50%; box-shadow: 0 6px 16px rgba(0,0,0,0.15); font-size: 18px;"><%= isFavorite ? '❤️' : '🤍' %></button>
+              <% const images = [pet.image, pet.image2, pet.image3].filter(Boolean); %>
+              <% if (images.length) { %>
+                <div id="petCarousel-<%= pet.id %>" class="carousel slide" data-bs-ride="false">
+                  <div class="carousel-inner">
+                    <% images.forEach((img, idx) => { %>
+                      <% const imgSrc = (img && img.startsWith('/')) ? img : `/uploads/${img}`; %>
+                      <div class="carousel-item <%= idx === 0 ? 'active' : '' %>">
+                        <img src="<%= imgSrc %>" alt="<%= pet.name %>" style="width: 100%; height: auto; display: block;">
+                      </div>
+                    <% }) %>
+                  </div>
+                  <% if (images.length > 1) { %>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#petCarousel-<%= pet.id %>" data-bs-slide="prev">
+                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#petCarousel-<%= pet.id %>" data-bs-slide="next">
+                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">Next</span>
+                    </button>
+                  <% } %>
+                </div>
+              <% } else { %>
+                <div style="height: 320px; display: flex; align-items: center; justify-content: center; color: #999;">ไม่มีรูปภาพ</div>
+              <% } %>
+            </div>
+          </div>
+          <div class="col-md-5">
+            <h4 style="font-weight: 700; color: #2f6f62; margin-bottom: 12px;">สวัสดีครับ, ผมชื่อ <%= pet.name %></h4>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">
+              <span style="background: #eef2f1; color: #2f6f62; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;">รหัส <%= pet.petId || '-' %></span>
+              <span style="background: #eef2f1; color: #2f6f62; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;">ประเภท <%= pet.type || '-' %></span>
+              <span style="background: #eef2f1; color: #2f6f62; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;">เพศ <%= (pet.gender === 'female' || pet.gender === '♀') ? 'เมีย' : 'ผู้' %></span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+              <div style="background: #f9fbfa; border-radius: 12px; padding: 10px;">
+                <div style="font-size: 12px; color: #6b7b77;">สี</div>
+                <div style="font-weight: 600; color: #2f6f62;"><%= pet.color || '-' %></div>
+              </div>
+              <div style="background: #f9fbfa; border-radius: 12px; padding: 10px;">
+                <div style="font-size: 12px; color: #6b7b77;">อายุ</div>
+                <div style="font-weight: 600; color: #2f6f62;"><%= pet.age || '-' %></div>
+              </div>
+              <div style="background: #f9fbfa; border-radius: 12px; padding: 10px;">
+                <div style="font-size: 12px; color: #6b7b77;">สถานะสุขภาพ</div>
+                <div style="font-weight: 600; color: #2f6f62;"><%= pet.sterilized ? (pet.sterilized === 'yes' ? 'ทำหมันแล้ว' : 'ยังไม่ทำหมัน') : '-' %></div>
+              </div>
+              <div style="background: #f9fbfa; border-radius: 12px; padding: 10px;">
+                <div style="font-size: 12px; color: #6b7b77;">สถานะการรับเลี้ยง</div>
+                <div style="font-weight: 600; color: #2f6f62;"><%= pet.adoptionStatus ? (pet.adoptionStatus === 'adopted' ? 'ได้รับการรับเลี้ยงแล้ว' : 'พร้อมรับเลี้ยง') : '-' %></div>
+              </div>
+              <div style="background: #f9fbfa; border-radius: 12px; padding: 10px;">
+                <div style="font-size: 12px; color: #6b7b77;">วัคซีน</div>
+                <div style="font-weight: 600; color: #2f6f62;">
+                  <% if ((pet.vaccinated || '').toLowerCase() === 'yes') { %>
+                    ฉีดแล้ว
+                  <% } else if (pet.vaccinated) { %>
+                    ยังไม่ฉีด
+                  <% } else { %>
+                    -
+                  <% } %>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top: 16px;">
+              <div style="font-weight: 600; color: #2f6f62; margin-bottom: 6px;">ข้อมูลสัตว์เลี้ยง</div>
+              <div style="background: #f6f7f8; border-radius: 12px; padding: 12px; color: #51605c; min-height: 64px;">
+                <%= pet.details || '-' %>
+              </div>
+            </div>
+
+            <div style="margin-top: 16px;">
+              <div style="font-weight: 600; color: #2f6f62; margin-bottom: 6px;">ช่องทางติดต่อ</div>
+              <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                <a href="tel:+66999999999" style="text-decoration: none; background: #e9f7f3; color: #2f6f62; padding: 8px 14px; border-radius: 999px; font-weight: 600;">📞 099-999-9999</a>
+                <a href="https://line.me/ti/p/~home4pets" target="_blank" rel="noopener" style="text-decoration: none; background: #e9f7f3; color: #2f6f62; padding: 8px 14px; border-radius: 999px; font-weight: 600;">💬 LINE: @home4pets</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,6 @@
 // ===== Pets service =====
 
+// Format age into display string
 function formatAge(row) {
   if (row.age_text) return row.age_text;
   const year = typeof row.age_year === 'number' ? row.age_year : 0;
@@ -8,6 +9,7 @@ function formatAge(row) {
   return `${year}Y ${month}M`;
 }
 
+// List pets for user with filters
 async function fetchPetsForUser(dbPromise, filters = {}) {
   const where = ["post_status = 'open'"];
   const params = [];
@@ -65,7 +67,7 @@ async function fetchPetsForUser(dbPromise, filters = {}) {
     params.push(filters.color);
   }
 
-  const sql = `SELECT id, pet_id, name, gender, age_year, age_month, age_text, type, image, vaccinated, sterilized, view_count
+  const sql = `SELECT id, pet_id, name, gender, age_year, age_month, age_text, type, image, image_2, image_3, vaccinated, sterilized, adoption_status, color, details, view_count
                FROM pets
                WHERE ${where.join(' AND ')}
                ORDER BY id`;
@@ -80,12 +82,18 @@ async function fetchPetsForUser(dbPromise, filters = {}) {
     ageMonth: row.age_month,
     type: row.type,
     image: row.image || '/cat.jpg',
+    image2: row.image_2,
+    image3: row.image_3,
+    adoptionStatus: row.adoption_status,
+    color: row.color,
+    details: row.details,
     vaccinated: (row.vaccinated || 'no'),
     sterilized: row.sterilized || 'no',
     viewCount: row.view_count || 0
   }));
 }
 
+// List pets for admin with filters
 async function fetchPetsForAdmin(dbPromise, filters = {}) {
   const where = [];
   const params = [];
@@ -168,6 +176,7 @@ async function fetchPetsForAdmin(dbPromise, filters = {}) {
   }));
 }
 
+// Get pet details by id
 async function fetchPetById(dbPromise, petId) {
   const rawId = Array.isArray(petId) ? petId[0] : petId;
   const numericId = Number.parseInt(rawId, 10);
@@ -201,6 +210,7 @@ async function fetchPetById(dbPromise, petId) {
   };
 }
 
+// Increment view count
 async function incrementPetView(dbPromise, petId) {
   const rawId = Array.isArray(petId) ? petId[0] : petId;
   const numericId = Number.parseInt(rawId, 10);
@@ -212,6 +222,7 @@ async function incrementPetView(dbPromise, petId) {
   return numericId;
 }
 
+// Create new pet
 async function addPet(dbPromise, payload) {
   const { body, files } = payload;
   const image1 = files?.image1?.[0] ? `/uploads/${files.image1[0].filename}` : '/cat.jpg';

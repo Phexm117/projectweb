@@ -30,14 +30,36 @@
 </nav>
 
 <!-- Landing Hero Section -->
-<section class="landing-hero">
-  <div class="landing-content">
-    <div class="landing-icon">
-      <img src="/white_house_logo-removebg-preview.png" alt="House Logo" style="max-width: 200px; height: auto;">
+<section class="landing-hero" style="background: url('/landing.png') no-repeat center center; background-size: cover; position: relative; overflow: visible; padding: 80px 20px; min-height: 600px; display: flex; align-items: center; justify-content: center;">
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 900px; width: 100%; align-items: center;">
+    <!-- ด้านซ้าย: รูป -->
+    <div style="position: relative; z-index: 2;">
+      <div style="background: linear-gradient(135deg, #d4a5d4 0%, #f5c9f5 100%); border-radius: 20px; padding: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); text-align: center;">
+        <img src="/white_house_logo-removebg-preview.png" alt="House Logo" style="max-width: 200px; height: auto;">
+      </div>
     </div>
-    <h1 style="font-size: 48px; font-weight: 700; margin: 24px 0;">ร่วมเป็นส่วนหนึ่ง</h1>
-    <p class="landing-quote" style="font-size: 20px; margin-bottom: 40px;">ในการมอบโอกาสใหม่ให้ชีวิตเล็ก ๆ เหล่านี้</p>
-    <a href="/login" class="landing-btn" style="background: #5ab89e; color: white; margin-bottom: 48px;">เข้าสู่ระบบ/สมัครสมาชิก</a>
+    <!-- ด้านขวา: ข้อมูล -->
+    <div style="position: relative; z-index: 2; background: white; border-radius: 20px; padding: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); text-align: center;">
+      <h1 style="font-size: 32px; font-weight: 700; margin: 0 0 10px 0; color: #2f6f62;">มอบโอกาส มอบชีวิตใหม่</h1>
+      <p style="font-size: 16px; color: #7fd1c2; margin: 0 0 30px 0;">ในการมอบโอกาสใหม่ให้ชีวิตเล็ก ๆ เหล่านี้</p>
+      
+      <div style="margin-bottom: 24px;">
+        <p style="font-size: 14px; color: #666; margin: 8px 0;"><strong>🏠 ค้นหาเพื่อนตัวน้อย</strong></p>
+        <p style="font-size: 14px; color: #999; margin: 8px 0;">ค้นหาสัตว์เลี้ยงที่เหมาะสมกับครอบครัว</p>
+      </div>
+      
+      <div style="margin-bottom: 24px;">
+        <p style="font-size: 14px; color: #666; margin: 8px 0;"><strong>❤️ บันทึกรายการโปรด</strong></p>
+        <p style="font-size: 14px; color: #999; margin: 8px 0;">เก็บสัตว์เลี้ยงที่ชอบไว้</p>
+      </div>
+      
+      <div style="margin-bottom: 30px;">
+        <p style="font-size: 14px; color: #666; margin: 8px 0;"><strong>💬 ติดต่อผู้เลี้ยง</strong></p>
+        <p style="font-size: 14px; color: #999; margin: 8px 0;">ติดต่อโดยตรงผ่าน LINE หรือโทร</p>
+      </div>
+      
+      <a href="/login" class="landing-btn" style="background: #5ab89e; color: white; padding: 12px 30px; display: inline-block; text-decoration: none; border-radius: 8px; font-weight: 600;">เข้าสู่ระบบ/สมัครสมาชิก</a>
+    </div>
   </div>
 </section>
 

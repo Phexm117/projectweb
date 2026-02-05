@@ -11,17 +11,36 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="/style.css">
+
+  <style>
+    .left-card {
+      width: 420px;
+      padding: 30px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.18);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.3);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      color: white;
+    }
+  </style>
 </head>
 <body>
 
 <!-- Landing Hero Section -->
-<section class="landing-hero">
-  <div class="landing-content">
+<section class="landing-hero" style="background: url('/landing.png') no-repeat center center; background-size: cover; position: relative; overflow: hidden; padding: 120px 20px 120px 220px; min-height: 100vh; display: flex; align-items: center; justify-content: flex-start;">
+  <div class="landing-content left-card" style="text-align: center; max-width: 580px;">
     <div class="landing-icon">
-      <img src="/white_house_logo-removebg-preview.png" alt="House Logo" style="max-width: 250px; height: auto;">
+      <img src="/white_house_logo-removebg-preview.png" alt="House Logo" style="max-width: 260px; height: auto;">
     </div>
-    <p class="landing-quote">“ ร่วมเป็นส่วนหนึ่ง<br>ในการมอบโอกาสใหม่ให้ชีวิตเล็ก ๆ เหล่านี้ ”</p>
-    <a href="/login" class="landing-btn">เข้าสู่ระบบ/สมัครสมาชิก</a>
+    <p class="landing-quote" style="font-size: 28px; line-height: 1.5; margin: 28px 0 36px; color: white; font-weight: 600; letter-spacing: 0.3px;">
+      <span class="q">“</span>
+      ร่วมเป็นส่วนหนึ่ง<br>
+      ในการมอบโอกาสใหม่ให้ชีวิตเล็ก ๆ เหล่านี้
+      <span class="q">”</span>
+    </p>
+    <a href="/login" class="landing-btn" style="background: #5ab89e; color: white; padding: 14px 36px; display: inline-block; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 18px;">เข้าสู่ระบบ/สมัครสมาชิก</a>
   </div>
 </section>
 

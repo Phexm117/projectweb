@@ -977,6 +977,7 @@ app.get('/home', requireUser, userController.home);
 app.get('/recommended', requireUser, userController.recommended);
 app.get('/favorites', requireUser, userController.favorites);
 app.get('/pet/:id', requireUser, userController.petDetail);
+app.post('/pets/:id/view', requireUser, userController.incrementView);
 
 app.get('/notifications', requireUser, userController.notificationsPage);
 app.get('/notifications/stream', requireUser, userController.notificationsStream);

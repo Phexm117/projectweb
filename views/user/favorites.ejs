@@ -80,7 +80,7 @@
       }; %>
       <div class="pet-cards-container">
         <% pets.forEach(pet => { %>
-        <div class="pet-card favorite-item" data-petid="<%= pet.id %>" onclick="location.href='/pet/<%= pet.id %>'" style="cursor: pointer;">
+        <div class="pet-card favorite-item" data-petid="<%= pet.id %>" data-bs-toggle="modal" data-bs-target="#petModal-<%= pet.id %>" style="cursor: pointer;">
           <div class="pet-image-wrap">
             <img src="<%= pet.image %>" alt="<%= pet.name %>">
             <span class="pet-view-badge">
@@ -101,9 +101,10 @@
             <% } %>
           </p>
           <div class="pet-footer">
-            <span class="badge-small" onclick="event.stopPropagation(); location.href='/pet/<%= pet.id %>'">รายละเอียด</span>
+            <span class="badge-small">รายละเอียด</span>
           </div>
         </div>
+        <%- include('../partials/pet-modal', { pet: pet, isFavorite: true }) %>
         <% }); %>
       </div>
       
@@ -141,6 +142,19 @@ async function toggleFavorite(element, petId) {
     }
   }
 }
+
+// Increment view count when modal opens
+document.querySelectorAll('.pet-modal').forEach((modalEl) => {
+  modalEl.addEventListener('shown.bs.modal', async () => {
+    const petId = modalEl.getAttribute('data-petid');
+    if (!petId) return;
+    try {
+      await fetch(`/pets/${petId}/view`, { method: 'POST' });
+    } catch (err) {
+      // ignore
+    }
+  });
+});
 </script>
 
 <script>

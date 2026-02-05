@@ -2,6 +2,7 @@
 
 const { formatAge } = require('./pets-service');
 
+// Get favorite pet ids for user
 async function fetchFavoriteIds(dbPromise, userId) {
   const [rows] = await dbPromise.query(
     'SELECT pet_id FROM favorites WHERE user_id = ? ORDER BY favorite_id DESC',
@@ -10,9 +11,10 @@ async function fetchFavoriteIds(dbPromise, userId) {
   return rows.map(row => row.pet_id.toString());
 }
 
+// Get favorite pet details for user
 async function fetchFavoritePets(dbPromise, userId) {
   const [rows] = await dbPromise.query(
-    `SELECT p.id, p.pet_id, p.name, p.gender, p.age_year, p.age_month, p.age_text, p.type, p.image, p.vaccinated, p.view_count, p.sterilized
+    `SELECT p.id, p.pet_id, p.name, p.gender, p.age_year, p.age_month, p.age_text, p.type, p.image, p.image_2, p.image_3, p.adoption_status, p.color, p.details, p.vaccinated, p.view_count, p.sterilized
      FROM favorites f
      JOIN pets p ON p.id = f.pet_id
      WHERE f.user_id = ? AND p.post_status = 'open'
@@ -29,12 +31,18 @@ async function fetchFavoritePets(dbPromise, userId) {
     ageMonth: row.age_month,
     type: row.type,
     image: row.image || '/cat.jpg',
+    image2: row.image_2,
+    image3: row.image_3,
+    adoptionStatus: row.adoption_status,
+    color: row.color,
+    details: row.details,
     vaccinated: (row.vaccinated || 'no'),
     sterilized: row.sterilized || 'no',
     viewCount: row.view_count || 0
   }));
 }
 
+// Toggle favorite status
 async function toggleFavorite(dbPromise, userId, petId) {
   const [rows] = await dbPromise.query(
     'SELECT favorite_id FROM favorites WHERE user_id = ? AND pet_id = ? LIMIT 1',

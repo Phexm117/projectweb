@@ -92,6 +92,7 @@ function createUserController({ dbPromise, viewCounts, searchProfiles, sessions 
     return score;
   }
   return {
+    // Home: search and list pets
     async home(req, res) {
       const pets = await fetchPetsForUser(dbPromise, req.query || {});
       const favoriteIds = await fetchFavoriteIds(dbPromise, req.user.id);
@@ -103,6 +104,7 @@ function createUserController({ dbPromise, viewCounts, searchProfiles, sessions 
       }
       res.render('user/user_home', { user: req.user, pets: pets, filters: req.query || {}, favoriteIds });
     },
+    // Recommended pets page
     async recommended(req, res) {
       const pets = await fetchPetsForUser(dbPromise);
       const favoriteIds = await fetchFavoriteIds(dbPromise, req.user.id);
@@ -135,10 +137,12 @@ function createUserController({ dbPromise, viewCounts, searchProfiles, sessions 
       const sortedPets = scoredPets.map(item => item.pet);
       res.render('user/recommended', { user: req.user, pets: sortedPets, favoriteIds });
     },
+    // Favorites page
     async favorites(req, res) {
       const pets = await fetchFavoritePets(dbPromise, req.user.id);
       res.render('user/favorites', { user: req.user, pets: pets });
     },
+    // Pet detail page
     async petDetail(req, res) {
       const petId = req.params.id;
       if (!viewCounts[req.user.id]) viewCounts[req.user.id] = {};
@@ -167,10 +171,12 @@ function createUserController({ dbPromise, viewCounts, searchProfiles, sessions 
       const favoriteIds = await fetchFavoriteIds(dbPromise, req.user.id);
       res.render('user/pet-detail', { user: req.user, petData: petData, favoriteIds });
     },
+    // Notifications page
     async notificationsPage(req, res) {
       const notifications = await fetchNotifications(dbPromise, req.user.id);
       res.render('user/notifications', { user: req.user, notifications });
     },
+    // Notifications stream (SSE)
     async notificationsStream(req, res) {
       res.setHeader('Content-Type', 'text/event-stream');
       res.setHeader('Cache-Control', 'no-cache');
@@ -195,6 +201,7 @@ function createUserController({ dbPromise, viewCounts, searchProfiles, sessions 
       const interval = setInterval(send, 5000);
       req.on('close', () => clearInterval(interval));
     },
+    // Latest notifications API
     async notificationsLatest(req, res) {
       try {
         const notifications = await fetchNotifications(dbPromise, req.user.id, 20);
@@ -203,10 +210,12 @@ function createUserController({ dbPromise, viewCounts, searchProfiles, sessions 
         return res.status(500).json({ success: false });
       }
     },
+    // Profile edit page
     async editProfilePage(req, res) {
       const profile = sanitizeProfile(await findUserById(dbPromise, req.user.id));
       return res.render('user/edit-profile', { user: req.user, profile });
     },
+    // Profile update action
     async updateProfile(req, res) {
       try {
         const { name, email } = req.body;
@@ -321,6 +330,20 @@ function createUserController({ dbPromise, viewCounts, searchProfiles, sessions 
         return res.json({ success: true, favorited: result.favorited });
       } catch (err) {
         console.error('Toggle favorite error:', err.message);
+        return res.status(500).json({ success: false });
+      }
+    },
+    async incrementView(req, res) {
+      const rawPetId = req.params.id;
+      const petId = Number.parseInt(rawPetId, 10);
+      if (!Number.isFinite(petId)) {
+        return res.status(400).json({ success: false });
+      }
+      try {
+        await incrementPetView(dbPromise, petId);
+        return res.json({ success: true });
+      } catch (err) {
+        console.error('Increment view error:', err.message);
         return res.status(500).json({ success: false });
       }
     }
