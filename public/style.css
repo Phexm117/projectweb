@@ -7,6 +7,29 @@ body {
   font-family: "Kanit", "Segoe UI", Tahoma, sans-serif;
 }
 
+.landing-page {
+  background: #7fd1c2;
+  min-height: 100svh;
+}
+
+.landing-page .landing-hero {
+  min-height: 100svh;
+}
+
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+img, video, canvas, svg {
+  max-width: 100%;
+  height: auto;
+}
+
 /* ===== Navbar ===== */
 .navbar {
   background: #ffffff;
@@ -20,6 +43,7 @@ body {
 .navbar-brand {
   font-weight: 600;
   color: #2f6f62;
+  white-space: normal;
 }
 
 .navbar img {
@@ -1016,6 +1040,21 @@ body {
     padding: 36px 24px;
   }
 
+  .landing-hero {
+    padding: 40px 16px !important;
+    min-height: 100svh !important;
+  }
+
+  .landing-page .landing-hero {
+    justify-content: center !important;
+  }
+
+  .landing-page .left-card {
+    width: 100% !important;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
   .pet-detail-card {
     padding: 18px;
   }
@@ -1036,6 +1075,10 @@ body {
 @media (max-width: 576px) {
   .navbar {
     justify-content: center;
+  }
+
+  .landing-hero {
+    padding: 32px 12px !important;
   }
 
   .navbar .d-flex.align-items-center {
@@ -1172,6 +1215,7 @@ body {
   margin-bottom: 30px;
   animation: bounce 2s infinite;
 }
+
 
 @keyframes bounce {
   0%, 100% {
