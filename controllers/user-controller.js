@@ -8,7 +8,8 @@ const {
   createUser,
   updatePasswordByEmail,
   updatePasswordById,
-  updateUserProfile
+  updateUserProfile,
+  verifyPassword
 } = require('../services/auth-service');
 const { fetchNotifications, getUnreadCount, markRead } = require('../services/notifications-service');
 
@@ -261,7 +262,8 @@ function createUserController({ dbPromise, viewCounts, searchProfiles, sessions 
         }
 
         const existing = await findUserById(dbPromise, req.user.id);
-        if (!existing || existing.password !== currentPassword) {
+        // ตรวจสอบรหัสผ่านปัจจุบันด้วย bcrypt
+        if (!existing || !(await verifyPassword(currentPassword, existing.password))) {
           return res.render('user/change-password', { user: req.user, error: 'รหัสผ่านปัจจุบันไม่ถูกต้อง' });
         }
 

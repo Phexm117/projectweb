@@ -1,6 +1,6 @@
 // ===== Auth controller =====
 
-const { findUserByEmail } = require('../services/auth-service');
+const { findUserByEmail, verifyPassword } = require('../services/auth-service');
 
 function createAuthController({ dbPromise, sessions }) {
   return {
@@ -11,7 +11,9 @@ function createAuthController({ dbPromise, sessions }) {
       try {
         const { email, password } = req.body;
         const user = await findUserByEmail(dbPromise, email);
-        if (!user || user.password !== password) {
+        
+        // ตรวจสอบว่ามี user และรหัสผ่าน hash ตรงกันหรือไม่
+        if (!user || !(await verifyPassword(password, user.password))) {
           return res.render('user/login', { error: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' });
         }
         const sessionId = Math.random().toString(36).substring(7);

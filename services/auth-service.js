@@ -1,5 +1,8 @@
 // ===== Auth service =====
 
+const bcrypt = require('bcrypt');
+const SALT_ROUNDS = 10;
+
 async function findUserByEmail(dbPromise, email) {
   const [rows] = await dbPromise.query(
     'SELECT id, name, email, role, password FROM users WHERE email = ? LIMIT 1',
@@ -16,25 +19,38 @@ async function findUserById(dbPromise, userId) {
   return rows && rows[0];
 }
 
+// Hash password ก่อนบันทึกลงฐานข้อมูล
+async function hashPassword(plainPassword) {
+  return await bcrypt.hash(plainPassword, SALT_ROUNDS);
+}
+
+// ตรวจสอบรหัสผ่านที่ user ป้อนกับ hash ในฐานข้อมูล
+async function verifyPassword(plainPassword, hashedPassword) {
+  return await bcrypt.compare(plainPassword, hashedPassword);
+}
+
 async function createUser(dbPromise, payload) {
   const { name, email, password, role = 'user' } = payload;
+  const hashedPassword = await hashPassword(password);
   await dbPromise.query(
     'INSERT INTO users (name, email, password, role, created_at) VALUES (?, ?, ?, ?, ?)',
-    [name, email, password, role, new Date()]
+    [name, email, hashedPassword, role, new Date()]
   );
 }
 
 async function updatePasswordByEmail(dbPromise, email, newPassword) {
+  const hashedPassword = await hashPassword(newPassword);
   await dbPromise.query(
     'UPDATE users SET password = ? WHERE email = ?',
-    [newPassword, email]
+    [hashedPassword, email]
   );
 }
 
 async function updatePasswordById(dbPromise, userId, newPassword) {
+  const hashedPassword = await hashPassword(newPassword);
   await dbPromise.query(
     'UPDATE users SET password = ? WHERE id = ?',
-    [newPassword, userId]
+    [hashedPassword, userId]
   );
 }
 
@@ -52,5 +68,7 @@ module.exports = {
   createUser,
   updatePasswordByEmail,
   updatePasswordById,
-  updateUserProfile
+  updateUserProfile,
+  hashPassword,
+  verifyPassword
 };
