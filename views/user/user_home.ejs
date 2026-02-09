@@ -142,6 +142,7 @@
               <span><%= formatViews(pet.viewCount) %></span>
             </span>
             <span class="heart-icon" onclick="event.stopPropagation(); toggleFavorite(this, '<%= pet.id %>')">🤍</span>
+
           </div>
           <h6><%= pet.name %></h6>
           <small class="text-muted">รหัส: <%= pet.petId || '-' %></small>
@@ -186,7 +187,11 @@ async function toggleFavorite(element, petId) {
   });
   const data = await response.json();
   if (data && data.success) {
-    element.textContent = data.favorited ? '❤️' : '🤍';
+    document.querySelectorAll('.heart-icon,button[onclick*="toggleFavorite"]').forEach(btn => {
+      if (btn.getAttribute('onclick')?.includes(petId) || btn.closest('.pet-card')?.getAttribute('data-petid') === petId) {
+        btn.textContent = data.favorited ? '❤️' : '🤍';
+      }
+    });
   }
 }
 

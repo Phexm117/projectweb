@@ -88,6 +88,7 @@
               <span><%= formatViews(pet.viewCount) %></span>
             </span>
             <span class="heart-icon" onclick="event.stopPropagation(); toggleFavorite(this, '<%= pet.id %>')">❤️</span>
+
           </div>
           <h6><%= pet.name %></h6>
           <small class="text-muted">รหัส: <%= pet.petId || '-' %></small>
@@ -133,8 +134,21 @@ async function toggleFavorite(element, petId) {
     body
   });
   const data = await response.json();
+  // sync heart icon on all cards and modals
+  document.querySelectorAll('.heart-icon,button[onclick*="toggleFavorite"]').forEach(btn => {
+    if (btn.getAttribute('onclick')?.includes(petId) || btn.closest('.pet-card')?.getAttribute('data-petid') === petId) {
+      btn.textContent = data && data.favorited ? '❤️' : '🤍';
+    }
+  });
   if (data && data.success && !data.favorited) {
-    const card = element.closest('.favorite-item');
+    // ปิด modal ถ้าอยู่ใน modal
+    const modal = element.closest('.modal');
+    if (modal && typeof bootstrap !== 'undefined') {
+      const modalInstance = bootstrap.Modal.getInstance(modal);
+      if (modalInstance) modalInstance.hide();
+    }
+    // ลบการ์ด
+    const card = document.querySelector('.pet-card.favorite-item[data-petid="' + petId + '"]');
     if (card) card.remove();
     const remaining = document.querySelectorAll('.favorite-item');
     if (remaining.length === 0) {
